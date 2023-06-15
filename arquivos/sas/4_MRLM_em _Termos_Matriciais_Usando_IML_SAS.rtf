@@ -1,0 +1,589 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2708
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fmodern\fcharset0 CourierNewPSMT;\f1\fmodern\fcharset0 CourierNewPS-BoldMT;\f2\fmodern\fcharset0 Courier;
+\f3\fmodern\fcharset0 Courier-Bold;}
+{\colortbl;\red255\green255\blue255;\red0\green128\blue0;\red0\green0\blue128;\red0\green0\blue255;
+\red0\green128\blue128;\red63\green105\blue30;\red0\green0\blue255;\red255\green255\blue255;\red85\green85\blue85;
+\red107\green0\blue109;\red2\green2\blue2;\red0\green0\blue0;\red16\green96\blue90;\red0\green0\blue109;
+\red26\green106\blue21;}
+{\*\expandedcolortbl;;\csgenericrgb\c0\c50196\c0;\csgenericrgb\c0\c0\c50196;\csgenericrgb\c0\c0\c100000;
+\csgenericrgb\c0\c50196\c50196;\cssrgb\c30831\c47797\c15540;\cssrgb\c0\c0\c100000;\cssrgb\c100000\c100000\c100000;\cssrgb\c40784\c40784\c40784;
+\cssrgb\c50196\c0\c50196;\cssrgb\c784\c784\c784;\cssrgb\c0\c0\c0;\cssrgb\c3137\c44706\c42745;\cssrgb\c0\c0\c50196;
+\cssrgb\c10588\c47843\c10588;}
+{\info
+{\author Maria Teresa Le\'e3o}}\paperw12240\paperh15840\vieww23480\viewh13280\viewkind1\viewscale200
+\deftab720
+\pard\pardeftab720\ri0\partightenfactor0
+
+\f0\fs24 \cf2 /* ################################################ */\cf0 \
+\cf2 /*     MRLM em  Termos Matriciais Usando IML-SAS    */\cf0 \
+\cf2 /*                Problema 3  - TRIGO               */\
+/* ################################################ */\cf0 \
+\pard\pardeftab720\ri0\partightenfactor0
+
+\f1\b \cf3 \
+proc
+\f0\b0 \cf0  
+\f1\b \cf3 iml
+\f0\b0 \cf0 ;\
+\cf4 reset\cf0  print;\
+\
+\
+\pard\pardeftab720\ri0\partightenfactor0
+\cf2 /* ### Entrada de Dados ### */\cf0 \
+\
+Y=\{
+\f1\b \cf5 40
+\f0\b0 \cf0 , 
+\f1\b \cf5 38
+\f0\b0 \cf0 , 
+\f1\b \cf5 50
+\f0\b0 \cf0 , 
+\f1\b \cf5 49
+\f0\b0 \cf0 , 
+\f1\b \cf5 50
+\f0\b0 \cf0 , 
+\f1\b \cf5 55
+\f0\b0 \cf0 , 
+\f1\b \cf5 70
+\f0\b0 \cf0 , 
+\f1\b \cf5 55
+\f0\b0 \cf0 , 
+\f1\b \cf5 45
+\f0\b0 \cf0 , 
+\f1\b \cf5 65
+\f0\b0 \cf0 ,\
+\pard\pardeftab720\ri0\partightenfactor0
+
+\f1\b \cf5 72
+\f0\b0 \cf0 , 
+\f1\b \cf5 70
+\f0\b0 \cf0 , 
+\f1\b \cf5 65
+\f0\b0 \cf0 , 
+\f1\b \cf5 80
+\f0\b0 \cf0 , 
+\f1\b \cf5 75
+\f0\b0 \cf0 \};\
+\
+X= \{
+\f1\b \cf5 1
+\f0\b0 \cf0  
+\f1\b \cf5 100
+\f0\b0 \cf0 	
+\f1\b \cf5 10
+\f0\b0 \cf0 ,\
+    
+\f1\b \cf5 1
+\f0\b0 \cf0  
+\f1\b \cf5 150
+\f0\b0 \cf0 	
+\f1\b \cf5 10
+\f0\b0 \cf0 ,\
+    
+\f1\b \cf5 1
+\f0\b0 \cf0  
+\f1\b \cf5 200
+\f0\b0 \cf0 	
+\f1\b \cf5 20
+\f0\b0 \cf0 ,\
+    
+\f1\b \cf5 1
+\f0\b0 \cf0  
+\f1\b \cf5 250
+\f0\b0 \cf0 	
+\f1\b \cf5 20
+\f0\b0 \cf0 ,\
+    
+\f1\b \cf5 1
+\f0\b0 \cf0  
+\f1\b \cf5 300
+\f0\b0 \cf0 	
+\f1\b \cf5 10
+\f0\b0 \cf0 ,\
+    
+\f1\b \cf5 1
+\f0\b0 \cf0  
+\f1\b \cf5 350
+\f0\b0 \cf0 	
+\f1\b \cf5 20
+\f0\b0 \cf0 ,\
+    
+\f1\b \cf5 1
+\f0\b0 \cf0  
+\f1\b \cf5 400
+\f0\b0 \cf0 	
+\f1\b \cf5 30
+\f0\b0 \cf0 ,\
+    
+\f1\b \cf5 1
+\f0\b0 \cf0  
+\f1\b \cf5 410
+\f0\b0 \cf0 	
+\f1\b \cf5 20
+\f0\b0 \cf0 ,\
+    
+\f1\b \cf5 1
+\f0\b0 \cf0  
+\f1\b \cf5 450
+\f0\b0 \cf0 	
+\f1\b \cf5 10
+\f0\b0 \cf0 ,\
+    
+\f1\b \cf5 1
+\f0\b0 \cf0  
+\f1\b \cf5 500
+\f0\b0 \cf0 	
+\f1\b \cf5 20
+\f0\b0 \cf0 ,\
+    
+\f1\b \cf5 1
+\f0\b0 \cf0  
+\f1\b \cf5 550
+\f0\b0 \cf0 	
+\f1\b \cf5 20
+\f0\b0 \cf0 ,\
+    
+\f1\b \cf5 1
+\f0\b0 \cf0  
+\f1\b \cf5 600
+\f0\b0 \cf0 	
+\f1\b \cf5 30
+\f0\b0 \cf0 ,\
+    
+\f1\b \cf5 1
+\f0\b0 \cf0  
+\f1\b \cf5 650
+\f0\b0 \cf0 	
+\f1\b \cf5 20
+\f0\b0 \cf0 ,\
+    
+\f1\b \cf5 1
+\f0\b0 \cf0  
+\f1\b \cf5 700
+\f0\b0 \cf0 	
+\f1\b \cf5 30
+\f0\b0 \cf0 ,\
+    
+\f1\b \cf5 1
+\f0\b0 \cf0  
+\f1\b \cf5 800
+\f0\b0 \cf0 	
+\f1\b \cf5 30
+\f0\b0 \cf0 \};\
+\
+n=nrow(X);\
+p=ncol(X);\
+\
+\pard\pardeftab720\ri0\partightenfactor0
+\cf2 /* ### Calculos Basicos ### */\cf0 \
+xlinhay=x`*y;\
+xlinhax=x`*x;\
+Ixlinhax=inv(xlinhax);\
+\
+\
+\
+\
+\cf2 /* ### Estimacao dos Parametros ### */\cf0 \
+beta=Ixlinhax*xlinhay;\
+\
+\
+\
+\
+\cf2 /* Determinando Yest e res\'edduos  */\cf0 \
+yest=x*beta;\
+res=y-yest;\
+\
+\
+\cf2 /* ou ... usando a matriz H  */\cf0 \
+H=x*Ixlinhax*x`;\
+\
+yest1=h*Y;\
+res1=(I(n)-H)*Y;\
+\
+\
+\cf2 /* Estimando a vari\'e2ncia do erro - sigma2 */\cf0 \
+\
+SSE1=res`*res;\
+\
+    \cf2 /*  ou ...   */\cf0 \
+SSE=y`*y-beta`*xlinhay;\
+\
+glres=n-p;\
+MSE=SSE/glres; \cf2 /* estimativa de sigma2  */\cf0 \
+\
+\
+\
+\cf2 /* ##################################################### */\cf0 \
+\cf2 /* Teste de Aus\'eancia de Regress\'e3o - Analise de Vari\'e2ncia */\cf0 \
+\cf2 /* ##################################################### */\cf0 \
+\
+um=J(n,
+\f1\b \cf5 1
+\f0\b0 \cf0 );\
+SSTO=y`*y-(y`*um*um`*y)/n;\
+MSTO=SSTO/(n-
+\f1\b \cf5 1
+\f0\b0 \cf0 );\
+\
+SSR=beta`*xlinhay-(y`*um*um`*y)/n;\
+\cf2 /* ou....  */\cf0 \
+SSR=SSTO-SSE;\
+MSR=SSR/(P-
+\f1\b \cf5 1
+\f0\b0 \cf0 );\
+\
+F=MSR/MSE;\
+\
+F005=FINV(
+\f1\b \cf5 0.95
+\f0\b0 \cf0 ,P-
+\f1\b \cf5 1
+\f0\b0 \cf0 ,n-p);\
+\
+\cf2 /* ou... */\cf0 \
+pF=
+\f1\b \cf5 1
+\f0\b0 \cf0 -probF(f,p-
+\f1\b \cf5 1
+\f0\b0 \cf0 ,n-p);\
+\
+\
+\
+\cf2 /* Coeficiente de Determina\'e7\'e3o */\cf0 \
+r2=SSR/ssto;\
+r2a=
+\f1\b \cf5 1
+\f0\b0 \cf0 -(mse/msto);\
+\
+\
+\cf2 /* Estimativa da matriz de covari\'e2ncia do vetor Beta    */\
+\cf0 s2beta=MSE*Ixlinhax;\
+\
+\
+\
+\cf2 /* ################################################ */\cf0 \
+\cf2 /*  ###       Infer\'eancia para os Par\'e2metros    ###  */\cf0 \
+\cf2 /* ################################################ */\cf0 \
+\
+alpha=
+\f1\b \cf5 0.05
+\f0\b0 \cf0 ;\
+\
+\cf2 /* ### beta0 ### */\cf0 \
+beta0=beta[
+\f1\b \cf5 1
+\f0\b0 \cf0 ];\
+vbeta0=s2beta[
+\f1\b \cf5 1
+\f0\b0 \cf0 ,
+\f1\b \cf5 1
+\f0\b0 \cf0 ];\
+sbeta0=sqrt(vbeta0);\
+cvbeta0=sbeta0/beta0;\
+\
+ \cf2 /* ## Teste beta0=0  ## */\cf0 \
+t0=beta0/sbeta0;\
+\
+    \cf2 /* # Teste Unilateral  #  */\cf0 \
+pt0=
+\f1\b \cf5 1
+\f0\b0 \cf0 -probt(t,n-p);\
+\cf2 /* ou */\cf0 \
+t005=tinv((
+\f1\b \cf5 1
+\f0\b0 \cf0 -alpha),n-p);\
+\
+    \cf2 /* # Teste Bilateral  #  */\cf0 \
+pvalorb0=probt(-t0,n-p)+(
+\f1\b \cf5 1
+\f0\b0 \cf0 -probt(t0,n-p));\
+\cf2 /* ou */\cf0 \
+t0025=tinv((
+\f1\b \cf5 1
+\f0\b0 \cf0 -alpha/
+\f1\b \cf5 2
+\f0\b0 \cf0 ),n-p);\
+\
+\
+ \cf2 /* ## IC beta0 ## */\cf0 \
+\
+t0025=tinv((
+\f1\b \cf5 1
+\f0\b0 \cf0 -alpha/
+\f1\b \cf5 2
+\f0\b0 \cf0 ),n-p);\
+\
+LIbeta0=beta0-t0025*sbeta0;\
+LSbeta0=beta0+t0025*sbeta0;\
+\
+\
+\
+\cf2 /* ### beta1 ### */\cf0 \
+beta1=beta[
+\f1\b \cf5 2
+\f0\b0 \cf0 ];\
+vbeta1=s2beta[
+\f1\b \cf5 2
+\f0\b0 \cf0 ,
+\f1\b \cf5 2
+\f0\b0 \cf0 ];\
+sbeta1=sqrt(vbeta1);\
+cvbeta1=sbeta1/beta1;\
+\
+\
+   \cf2 /* ## Teste beta1=0  ## */\cf0 \
+t1=beta1/sbeta1;\
+\
+pt1=
+\f1\b \cf5 1
+\f0\b0 \cf0 -probt(t1,n-p);\
+\cf2 /* ou */\cf0 \
+t005=tinv((
+\f1\b \cf5 1
+\f0\b0 \cf0 -alpha),n-p);\
+\
+\
+   \cf2 /* ## IC beta1  ## */\cf0 \
+t0025=tinv((
+\f1\b \cf5 1
+\f0\b0 \cf0 -alpha/
+\f1\b \cf5 2
+\f0\b0 \cf0 ),n-p);\
+\
+LIbeta1=beta1-t0025*sbeta1;\
+LSbeta1=beta1+t0025*sbeta1;\
+\
+\
+\cf2 /* ###  beta2 ### */\cf0 \
+beta2=beta[
+\f1\b \cf5 3
+\f0\b0 \cf0 ];\
+vbeta2=s2beta[
+\f1\b \cf5 3
+\f0\b0 \cf0 ,
+\f1\b \cf5 3
+\f0\b0 \cf0 ];\
+sbeta2=sqrt(vbeta2);\
+cvbeta2=sbeta2/beta2;\
+\
+   \cf2 /* ## Teste beta2=0  ## */\cf0 \
+t2=beta2/sbeta2;\
+pt2=
+\f1\b \cf5 1
+\f0\b0 \cf0 -probt(t2,n-p);\
+t005=tinv(
+\f1\b \cf5 0.95
+\f0\b0 \cf0 ,n-p);\
+\
+   \cf2 /* ## IC beta2  ## */\cf0 \
+t0025=tinv(
+\f1\b \cf5 0.975
+\f0\b0 \cf0 ,n-p);\
+LIbeta2=beta2-t0025*sbeta2;\
+LSbeta2=beta2+t0025*sbeta2;\
+\
+\
+\cf2 /* ##### Estima\'e7\'e3o Simult\'e2nea dos Par\'e2metros  #### */\
+/* ############################################### */\cf0 \
+\
+alfa=
+\f1\b \cf5 0.10
+\f0\b0 \cf0 ;\
+g=
+\f1\b \cf5 3
+\f0\b0 \cf0 ;          \cf2 /* numero de parametros */\cf0 \
+cof=
+\f1\b \cf5 1
+\f0\b0 \cf0 -alfa/(
+\f1\b \cf5 2
+\f0\b0 \cf0 *g);\
+B=tinv(cof,n-p);\
+\
+\
+\cf2 /* IC Beta0 */\cf0 \
+LIbeta0=beta0-B*sbeta0;\
+LSbeta0=beta0+B*sbeta0;\
+\
+\cf2 /* IC Beta1 */\cf0 \
+LIbeta1=beta1-B*sbeta1;\
+LSbeta1=beta1+B*sbeta1;\
+\
+\cf2 /* IC Beta2 */\cf0 \
+LIbeta2=beta2-B*sbeta2;\
+LSbeta2=beta2+B*sbeta2;\
+\
+\
+\
+\cf2 /* ############################# */\cf0 \
+\cf2 /*  Estima\'e7\'e3o da Resposta M\'e9dia  */\cf0 \
+\cf2 /* ############################# */\cf0 \
+\
+X0=\{
+\f1\b \cf5 1
+\f0\b0 \cf0 , 
+\f1\b \cf5 400
+\f0\b0 \cf0 , 
+\f1\b \cf5 20
+\f0\b0 \cf0 \};\
+Y0est=X0`*beta;\
+\
+VY0est=mse*(X0`*Ixlinhax*X0);\
+\cf2 /* ou ... */\cf0 \
+VY0est_=X0`*s2beta*X0;\
+\
+SY0est=sqrt(VY0est);\
+\
+alfa=
+\f1\b \cf5 0.05
+\f0\b0 \cf0 ;\
+cof=
+\f1\b \cf5 1
+\f0\b0 \cf0 -alfa/
+\f1\b \cf5 2
+\f0\b0 \cf0 ;\
+t=tinv(cof,n-p);\
+\
+LIY0est=Y0est-t*SY0est;\
+LSY0est=Y0est+t*SY0est;\
+\
+\
+\cf2 /*  ####################################### */\cf0 \
+\cf2 /*   ###  Predi\'e7\'e3o de Nova Observa\'e7\'e3o  ###  */\cf0 \
+\cf2 /*  ####################################### */\cf0 \
+\
+X0=\{
+\f1\b \cf5 1
+\f0\b0 \cf0 , 
+\f1\b \cf5 800
+\f0\b0 \cf0 , 
+\f1\b \cf5 25
+\f0\b0 \cf0 \};\
+Y0est=X0`*beta;\
+\
+VY0pred=mse*(
+\f1\b \cf5 1
+\f0\b0 \cf0 +X0`*Ixlinhax*X0);\
+SY0pred=sqrt(VY0pred);\
+\
+alfa=
+\f1\b \cf5 0.05
+\f0\b0 \cf0 ;\
+cof=
+\f1\b \cf5 1
+\f0\b0 \cf0 -alfa/
+\f1\b \cf5 2
+\f0\b0 \cf0 ;\
+t=tinv(cof,n-p);\
+\
+LIY0pred=Y0est-t005*SY0pred;\
+LSY0pred=Y0est+t005*SY0pred;\
+\
+\
+\cf6 /*  ####################################### */\
+/*    Intervalo de Confian\'e7a 0,90 para a    */\
+/*       m\'e9dia de m=4 novas observa\'e7\'f5es     */\
+/*  ####################################### */\cf0 \
+\
+X0=\{
+\f1\b \cf5 1
+\f0\b0 \cf0 , 
+\f1\b \cf5 500
+\f0\b0 \cf0 , 
+\f1\b \cf5 25
+\f0\b0 \cf0 \};\
+Y0est=X0`*beta;\
+m=
+\f1\b \cf5 4;
+\f0\b0 \cf0 \
+\
+VY0pred_media=mse*((
+\f1\b \cf6 1/m
+\f0\b0 \cf0 )+X0`*Ixlinhax*X0);\
+SY0pred_media=sqrt(VY0pred_media);\
+\
+
+\f1\b \cf6 /*  ou...  */
+\f0\b0 \cf0 \
+X0linhainvxlxX0=(X0`*Ixlinhax*X0);\
+VY0est=mse*(X0`*Ixlinhax*X0);\
+VY0pred_media1=mse*((1/m))+VY0est;\
+\
+t005=tinv(
+\f1\b \cf5 0.95
+\f0\b0 \cf0 ,n-p);\
+\
+LIY0pred_media=Y0est-t005*SY0pred_media;\
+LSY0pred_media=Y0est+t005*SY0pred_media;\
+\
+\
+\pard\pardeftab720\ri0\partightenfactor0
+
+\f1\b \cf3 quit
+\f0\b0 \cf0 ;\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\pard\pardeftab720\ri0\partightenfactor0
+\cf2 /* ######################################################*/\cf0 \
+\cf2 /* ##       CRIANDO VETOR Y E MATRIZ X A PARTIR        ##*/ \
+/* ##                 DE UM ARQUIVO SAS                ##*/\cf0 \
+\cf2 /* ######################################################*/\cf0 \
+\
+\pard\pardeftab720\partightenfactor0
+
+\f2 \cf7 \cb8 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec7 libname\cf9 \strokec9  reg \cf10 \strokec10 '/home/mtleaoest0/ARegLinear_2023_1'\cf11 \strokec12 ;\cf9 \strokec9  \cf11 \strokec11  \
+ \
+\cf7 \strokec7 options\cf9 \strokec9  \cf7 \strokec7 ls\cf11 \strokec12 =
+\f3\b \cf13 \strokec13 80
+\f2\b0 \cf9 \strokec9  \cf7 \strokec7 ps\cf11 \strokec12 =
+\f3\b \cf13 \strokec13 60
+\f2\b0 \cf9 \strokec9  \cf7 \strokec7 nodate\cf11 \strokec12 ;\strokec11  \
+
+\f3\b \cf14 \strokec14 proc
+\f2\b0 \cf9 \strokec9  
+\f3\b \cf14 \strokec14 iml
+\f2\b0 \cf11 \strokec12 ;\strokec11  \
+\cf7 \strokec7 reset\cf9 \strokec9  print\cf11 \strokec12 ;\strokec11  \
+  \
+\cf7 \strokec7 use\cf9 \strokec9  reg.trigo\cf11 \strokec12 ;\strokec11  \
+\cf15 \strokec15 /*  read all var _NUM_ into X; */\cf11 \strokec11  \
+\cf7 \strokec7 read\cf9 \strokec9  \cf7 \strokec7 all\cf9 \strokec9  \cf7 \strokec7 var\cf9 \strokec9  \cf11 \strokec12 \{\cf9 \strokec9 Y\cf11 \strokec12 \}\cf9 \strokec9  into Y\cf11 \strokec12 ;\strokec11  \
+\cf7 \strokec7 read\cf9 \strokec9  \cf7 \strokec7 all\cf9 \strokec9  \cf7 \strokec7 var\cf9 \strokec9  \cf11 \strokec12 \{\cf9 \strokec9 x1 x2\cf11 \strokec12 \}\cf9 \strokec9  into X\cf11 \strokec12 ;\cf9 \strokec9  \cf11 \strokec11  \
+\cf7 \strokec7 print\cf9 \strokec9  Y \cf11 \strokec12 ;\strokec11  \
+\cf7 \strokec7 print\cf9 \strokec9  x\cf11 \strokec12 ;\strokec11 \
+\cf7 \strokec7 close\cf9 \strokec9  reg.trigo\cf11 \strokec12 ;\strokec11  \
+\cf9 \strokec9 n\cf11 \strokec12 =\cf9 \strokec9 nrow\cf11 \strokec12 (\cf9 \strokec9 x\cf11 \strokec12 );\strokec11  \
+\cf9 \strokec9 um\cf11 \strokec12 =\cf9 \strokec9 J\cf11 \strokec12 (\cf9 \strokec9 n\cf11 \strokec12 ,
+\f3\b \cf13 \strokec13 1
+\f2\b0 \cf11 \strokec12 );\strokec11  \
+\cf7 \strokec7 x\cf11 \strokec12 =\cf9 \strokec9 insert\cf11 \strokec12 (\cf9 \strokec9 x\cf11 \strokec12 ,\cf9 \strokec9  um\cf11 \strokec12 ,\cf9 \strokec9  
+\f3\b \cf13 \strokec13 0
+\f2\b0 \cf11 \strokec12 ,\cf9 \strokec9  
+\f3\b \cf13 \strokec13 1
+\f2\b0 \cf11 \strokec12 );\strokec11  \
+\cf9 \strokec9 p\cf11 \strokec12 =\cf9 \strokec9 ncol\cf11 \strokec12 (\cf9 \strokec9 X\cf11 \strokec12 );
+\fs52 \strokec11  \
+\pard\pardeftab720\ri0\partightenfactor0
+
+\f0\fs24 \cf0 \cb1 \kerning1\expnd0\expndtw0 \outl0\strokewidth0 \
+\pard\pardeftab720\ri0\partightenfactor0
+
+\f1\b \cf3 quit
+\f0\b0 \cf0 ;\
+\
+\
+\pard\pardeftab720\ri0\partightenfactor0
+\cf2 /* ######################################################*/\cf0 \
+\
+}

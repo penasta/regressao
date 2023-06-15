@@ -1,0 +1,17 @@
+proc iml;
+reset print;
+use gordura;
+read all var {Y} into Y;
+read all var {x1 x2} into X;
+print Y;
+print x;
+close gordura;
+n=nrow(X);
+um=J(n,1);
+x=insert(x, um, 0, 1);
+
+p=ncol(X);
+
+X=um||x;
+
+w=x//um;
