@@ -71,3 +71,12 @@ ggplot(dados, aes(x = 1:length(dffits), y = dffits)) +
 
 # Alguns gráficos do modelo ----
 plot(fit)
+
+# Avaliação do modelo por métodos automáticos ----
+stepwise <- step(fit,direction = 'both') # stepwise
+backward <- step(fit,direction = 'backward') # backward
+forward <- step(fit,direction = 'forward') # forward
+
+summary(stepwise)
+summary(backward)
+summary(forward)
