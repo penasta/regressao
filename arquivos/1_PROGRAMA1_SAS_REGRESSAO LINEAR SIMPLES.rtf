@@ -1,0 +1,743 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2708
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fmodern\fcharset0 CourierNewPSMT;\f1\fmodern\fcharset0 CourierNewPS-BoldMT;\f2\froman\fcharset0 TimesNewRomanPSMT;
+}
+{\colortbl;\red255\green255\blue255;\red0\green128\blue0;\red0\green0\blue255;\red0\green128\blue128;
+\red128\green0\blue128;\red0\green0\blue128;}
+{\*\expandedcolortbl;;\csgenericrgb\c0\c50196\c0;\csgenericrgb\c0\c0\c100000;\csgenericrgb\c0\c50196\c50196;
+\csgenericrgb\c50196\c0\c50196;\csgenericrgb\c0\c0\c50196;}
+{\info
+{\author Maria Teresa Le\'e3o}}\paperw11900\paperh16840\margl1134\margr1134\margb1134\margt1134\vieww23940\viewh13280\viewkind1\viewscale200
+\deftab720
+\pard\pardeftab720\ri0\partightenfactor0
+
+\f0\fs24 \cf2 /* ################################################### */   \cf3 \
+\cf2 /* **** PROGRAMA1-SAS \'96 REGRESSAO LINEAR SIMPLES ****  */  \cf3 \
+\cf2 /* ################################################### */   \cf3 \
+\cf2 \
+\cf3 OPTIONS\cf0  \cf3 LS\cf0 =
+\f1\b \cf4 80
+\f0\b0 \cf0  \cf3 PS\cf0 =
+\f1\b \cf4 60
+\f0\b0 \cf0  \cf3 NODATE\cf0 ;\
+\
+\cf2 /* ********* Criando arquivo SAS permanente  ********* */\cf0 \
+\
+\cf2 /*  ***  1)- Cria\'e7\'e3o de Biblioteca ***                 */\cf0 \
+ \
+\cf2 /*         ***  Via programa editor **                 */\cf0 \
+\
+\cf3 libname\cf0  reg \cf5 '/home/mtleaoest0/ARegLinear_2023_1\'92\cf0 ; \
+\
+\
+\cf2 /*  ***  2)- Cria\'e7\'e3o do Arquivo na Biblioteca   ***    */\cf0 \
+\
+\
+\cf2 /* ################################################### */\cf0 \
+\cf2 /* ***********  ENTRADA DE DADOS  ************** */\cf0 \
+\cf2 /* ********************************************* */\cf0  \
+\
+\cf2 /* *** via programa  *** */\cf0 \
+\
+\pard\pardeftab720\ri0\partightenfactor0
+
+\f1\b \cf6 data
+\f0\b0 \cf0  reg.problema1;\
+\pard\pardeftab720\ri0\partightenfactor0
+\cf3 input\cf0  cid massa taxa;\
+\cf3 datalines\cf0 ;\
+1	62.0	1792\
+2	62.9	1666\
+3	36.1	995\
+4	54.6	1425\
+5	48.5	1396\
+6	42.0	1418\
+7	47.4	1362\
+8	50.6	1502\
+9	42.0	1256\
+10	48.7	1614\
+11	40.3	1189\
+12	33.1	913\
+13	51.9	1460\
+14	42.4	1124\
+15	34.5	1052\
+16	51.1	1347\
+17	41.2	1204\
+18	51.9	1867\
+19	46.9	1439\
+;\
+\pard\pardeftab720\ri0\partightenfactor0
+
+\f1\b \cf6 run
+\f0\b0 \cf0 ;\
+\
+\
+\
+\
+\pard\pardeftab720\ri0\partightenfactor0
+\cf2 /* *******   VIA IMPORTA\'c7\'c3O DE DADOS   ******* */\cf0 \
+\
+\cf2 /* *** PROC IMPORT  **** */\cf0 \
+\cf2 \
+     * - via codigo de programa -  PROC IMPORT      */\cf0 \
+\
+\cf2 /* ** Formato EXCEL (.xlsx) **                              */\cf0 \
+\
+\pard\pardeftab720\ri0\partightenfactor0
+
+\f1\b \cf6 proc
+\f0\b0 \cf0  
+\f1\b \cf6 import
+\f0\b0 \cf0  \
+  \cf3 datafile\cf0 =
+\fs20 \cf5 "/home/mtleaoest0/ARegLinear_2021_2/dadosProb1.xlsx"\cf0  
+\fs24 \
+             \cf3 out\cf0 =reg.prob1 \cf3 DBMS\cf0 =xlsx REPLACE;\
+     \cf3 sheet\cf0 =\cf5 "Dados_prob1"\cf0 ; \
+     \cf3 GETNAMES\cf0 =YES;\
+
+\f1\b \cf6 run
+\f0\b0 \cf0 ;\
+\
+\
+\pard\pardeftab720\ri0\partightenfactor0
+\cf2 /* Vendo conte\'fado do arquivo SAS  */\cf0 \
+\
+\pard\pardeftab720\ri0\partightenfactor0
+
+\f1\b \cf6 proc
+\f0\b0 \cf0  
+\f1\b \cf6 contents
+\f0\b0 \cf0  \cf3 data\cf0 =reg.prob1 \cf3 varnum\cf0 ;\
+
+\f1\b \cf6 run
+\f0\b0 \cf0 ;\
+\
+\
+\
+\pard\pardeftab720\ri0\partightenfactor0
+\cf2 /* ***********  Listando os DADOS  ************** */\cf0 \
+\cf2 /* ********************************************** */\cf0  \
+\
+\
+\pard\pardeftab720\ri0\partightenfactor0
+
+\f1\b \cf6 proc
+\f0\b0 \cf0  
+\f1\b \cf6 print
+\f0\b0 \cf0  \cf3 data\cf0 =reg.prob1 \cf3 label\cf0 ;\
+\pard\pardeftab720\ri0\partightenfactor0
+\cf3 var\cf0  cid massa taxa;\
+\
+\cf3 LABEL\cf0  cid=\cf5 'C\'f3digo identifica\'e7\'e3o do individuo'\cf0 \
+      taxa=\cf5 'taxa de metabolismo em repouso (em calorias)'\cf0 \
+      massa=\cf5 'massa do corpo sem gordura (em quilos)'\cf0 ;\
+\pard\pardeftab720\ri0\partightenfactor0
+
+\f1\b \cf6 run
+\f0\b0 \cf0 ;\
+\
+\pard\pardeftab720\ri0\partightenfactor0
+\cf2 /* ***********  Analise Descritiva ************** */\cf0 \
+\
+\pard\pardeftab720\ri0\partightenfactor0
+
+\f1\b \cf6 proc
+\f0\b0 \cf0  
+\f1\b \cf6 univariate
+\f0\b0 \cf0  \cf3 data\cf0 =reg.problema1;\
+	\cf3 var\cf0  massa taxa;\
+
+\f1\b \cf6 run
+\f0\b0 \cf0 ;\
+\
+\
+\pard\pardeftab720\ri0\partightenfactor0
+\cf2 /* Op\'e7\'f5es PLOT e NORMAL */\cf0 \
+\pard\pardeftab720\ri0\partightenfactor0
+
+\f1\b \cf6 proc
+\f0\b0 \cf0  
+\f1\b \cf6 univariate
+\f0\b0 \cf0  \cf3 data\cf0 =prob1a \cf3 plot\cf0  \cf3 normal\cf0 ;\
+	\cf3 var\cf0  massa taxa;\
+
+\f1\b \cf6 run
+\f0\b0 \cf0 ;\
+\
+\
+
+\f1\b \cf6 proc
+\f0\b0 \cf0  
+\f1\b \cf6 univariate
+\f0\b0 \cf0  \cf3 data\cf0 =prob1a \cf3 plot\cf0  \cf3 normal\cf0 ;\
+	\cf3 var\cf0  massa taxa;\
+
+\f1\b \cf6 run
+\f0\b0 \cf0 ;\
+\
+\
+\
+\pard\pardeftab720\ri0\partightenfactor0
+\cf2 /* ***********  Analise de Associa\'e7\'e3o ************** */\cf0 \
+\
+\cf2 /* ***********  Diagrama de Dispers\'e3o ************** */\cf0 \
+\
+\pard\pardeftab720\ri0\partightenfactor0
+
+\f1\b \cf6 proc
+\f0\b0 \cf0  
+\f1\b \cf6 gplot
+\f0\b0 \cf0  \cf3 data\cf0 =reg.problema1;\
+   \cf3 plot\cf0  taxa*massa;\
+
+\f1\b \cf6 run
+\f0\b0 \cf0 ;\
+\
+\
+\pard\pardeftab720\ri0\partightenfactor0
+\cf3 axis1\cf0  \cf3 label\cf0 =(\cf3 angle\cf0 =
+\f1\b \cf4 90
+\f0\b0 \cf0  \cf5 "Taxa de metabolismo (em calorias queimadas a cada 24h)"\cf0 );  \
+\cf3 axis2\cf0  \cf3 label\cf0 =(\cf3 angle\cf0 =
+\f1\b \cf4 0
+\f0\b0 \cf0  \cf5 "Massa do corpo sem gordura (em kg)"\cf0 );       \
+\cf3 symbol\cf0  \cf3 v\cf0 =dot \cf3 c\cf0 =red ; \
+\pard\pardeftab720\ri0\partightenfactor0
+
+\f1\b \cf6 proc
+\f0\b0 \cf0  
+\f1\b \cf6 gplot
+\f0\b0 \cf0  \cf3 data\cf0 =reg.prob1;\
+   \cf3 plot\cf0  taxa*massa/\cf3 vaxis\cf0 =axis1 \cf3 haxis\cf0 =axis2;\
+
+\f1\b \cf6 run
+\f0\b0 \cf0 ;\
+
+\f1\b \cf6 quit
+\f0\b0 \cf0 ;\
+\
+\
+\pard\pardeftab720\ri0\partightenfactor0
+\cf2 /* **********  Medida de Associa\'e7\'e3o ************* */\cf0 \
+\
+\pard\pardeftab720\ri0\partightenfactor0
+
+\f1\b \cf6 proc
+\f0\b0 \cf0  
+\f1\b \cf6 corr
+\f0\b0 \cf0  \cf3 data\cf0 =reg.problema1;\
+	\cf3 var\cf0  taxa massa ;\
+
+\f1\b \cf6 run
+\f0\b0 \cf0 ;\
+\
+\
+\pard\pardeftab720\ri0\partightenfactor0
+\cf2 /* ############################################### */ \cf0 \
+\cf2 /* ***********  Modelo de Regress\'e3o ************** */\cf0 \
+\cf2 /* ############################################### */ \cf0 \
+\
+\pard\pardeftab720\ri0\partightenfactor0
+
+\f1\b \cf6 proc
+\f0\b0 \cf0  
+\f1\b \cf6 reg
+\f0\b0 \cf0  \cf3 data\cf0 =reg.problema1; \
+    \cf3 model\cf0  taxa=massa ; \
+
+\f1\b \cf6 run
+\f0\b0 \cf0 ;
+\f2 \
+\
+\pard\pardeftab720\ri0\partightenfactor0
+
+\f0 \cf2  \cf0 \
+\pard\pardeftab720\ri992\partightenfactor0
+\cf2 /*** incluindo medidas descritivas e\
+     coeficiente de correlacao */\cf0 \
+\
+\pard\pardeftab720\ri992\partightenfactor0
+
+\f1\b \cf6 proc
+\f0\b0 \cf0  
+\f1\b \cf6 reg
+\f0\b0 \cf0  \cf3 data\cf0 =bib.problema1 \cf3 simple\cf0  \cf3 corr\cf0 ; \
+    \cf3 model\cf0  taxa=massa ; \
+
+\f1\b \cf6 run
+\f0\b0 \cf0 ;\
+\
+\pard\pardeftab720\ri992\partightenfactor0
+\cf2 /* ** diagrama de dispersao com reta ajustada **** */\cf0 \
+\pard\pardeftab720\ri992\partightenfactor0
+\cf3 symbol\cf0  \cf3 v\cf0 =dot \cf3 c\cf0 =blue ; \
+
+\f1\b \cf6 proc
+\f0\b0 \cf0  
+\f1\b \cf6 reg
+\f0\b0 \cf0  \cf3 data\cf0 =bib.problema1; \
+    \cf3 model\cf0  taxa=massa ; \
+    \cf3 plot\cf0  taxa*massa; \
+
+\f1\b \cf6 run
+\f0\b0 \cf0 ;\
+
+\f1\b \cf6 quit
+\f0\b0 \cf0 ;\
+\
+\pard\pardeftab720\ri992\partightenfactor0
+\cf2 /**determinando os valores preditos estimados  e res\'edduos*/\
+\cf0 \
+\pard\pardeftab720\ri992\partightenfactor0
+
+\f1\b \cf6 proc
+\f0\b0 \cf0  
+\f1\b \cf6 reg
+\f0\b0 \cf0  \cf3 data\cf0 =bib.problema1; \
+        \cf3 model\cf0  taxa=massa /\cf3 p\cf0  \cf3 r\cf0 ;\
+
+\f1\b \cf6 run
+\f0\b0 \cf0 ;\
+\
+\pard\pardeftab720\ri0\partightenfactor0
+\cf2   \cf3 \
+\cf2 /* ****  An\'e1lise de Res\'edduos  **** */  \cf3 \
+\cf2 /* ############################### */ \cf0 \
+\pard\pardeftab720\ri992\partightenfactor0
+\cf0 \
+\cf2 /**criando graficos de residuos */\cf0 \
+\
+\pard\pardeftab720\ri992\partightenfactor0
+
+\f1\b \cf6 proc
+\f0\b0 \cf0  
+\f1\b \cf6 reg
+\f0\b0 \cf0  \cf3 data\cf0 =bib.problema1; \
+    \cf3 model\cf0  taxa=massa ; \
+    \cf3 plot\cf0  \cf4 r.\cf0 *massa   \cf4 r.\cf0 *\cf4 p.\cf0  ;\
+    \cf3 title\cf0  \cf5 'Normal PP Plot'\cf0 ; \
+    \cf3 plot\cf0  \cf4 npp.\cf0 *\cf4 r.\cf0 ; \
+    \cf3 title\cf0  \cf5 'Normal QQ Plot'\cf0 ; \
+    \cf3 plot\cf0  \cf4 r.\cf0 *\cf4 nqq.\cf0 /\cf3 nostat\cf0  \cf3 cframe\cf0 =ligr;\
+
+\f1\b \cf6 run
+\f0\b0 \cf0 ;\
+\
+\
+\
+\pard\pardeftab720\ri992\partightenfactor0
+\cf2 /*** ou ainda **** */\cf0 \
+\
+\pard\pardeftab720\ri992\partightenfactor0
+
+\f1\b \cf6 proc
+\f0\b0 \cf0  
+\f1\b \cf6 reg
+\f0\b0 \cf0  \cf3 data\cf0 =bib.problema1; \
+    \cf3 model\cf0  taxa=massa ; \
+    \cf3 plot\cf0  \cf4 r.\cf0 *massa /\cf3 vref\cf0 = -
+\f1\b \cf4 266.14
+\f0\b0 \cf0  -
+\f1\b \cf4 133.07
+\f0\b0 \cf0  
+\f1\b \cf4 0
+\f0\b0 \cf0  
+\f1\b \cf4 133.07
+\f0\b0 \cf0 \
+            
+\f1\b \cf4 266.14
+\f0\b0 \cf0  
+\f1\b \cf4 399.21
+\f0\b0 \cf0  ; \
+    \cf3 plot\cf0  \cf4 r.\cf0 *\cf4 p.\cf0  /\cf3 vref\cf0 = -
+\f1\b \cf4 266.14
+\f0\b0 \cf0  -
+\f1\b \cf4 133.07
+\f0\b0 \cf0  
+\f1\b \cf4 0
+\f0\b0 \cf0  
+\f1\b \cf4 133.07
+\f0\b0 \cf0 \
+            
+\f1\b \cf4 266.14
+\f0\b0 \cf0  
+\f1\b \cf4 399.21
+\f0\b0 \cf0 ; \
+
+\f1\b \cf6 run
+\f0\b0 \cf0 ;\
+\
+\
+\pard\pardeftab720\ri992\partightenfactor0
+\cf2 /*** ou ainda **** */\cf0 \
+\
+\cf2 /* Criando um arquivo com os residuos e valores preditos */\
+\pard\pardeftab720\ri992\partightenfactor0
+
+\f1\b \cf6 \
+proc
+\f0\b0 \cf0  
+\f1\b \cf6 reg
+\f0\b0 \cf0  \cf3 data\cf0 =bib.problema1; \
+    \cf3 model\cf0  taxa=massa ; \
+	\cf3 output\cf0  \cf3 out\cf0 =residuos1 \cf3 r\cf0 =residuo\
+                \cf3 p\cf0 =predito;\
+
+\f1\b \cf6 run
+\f0\b0 \cf0 ;\
+
+\f1\b \cf6 quit
+\f0\b0 \cf0 ;\
+\
+
+\f1\b \cf6 proc
+\f0\b0 \cf0  
+\f1\b \cf6 print
+\f0\b0 \cf0  \cf3 data\cf0 =residuos1;\
+
+\f1\b \cf6 run
+\f0\b0 \cf0 ;\
+\
+\
+\
+\
+\pard\pardeftab720\ri992\partightenfactor0
+\cf2 /* Criando res\'edduos semistudentizado, res\'edduos ao quadrado e em valor absoluto a  partir do arquivo com os residuos */\
+\cf0 \
+\pard\pardeftab720\ri992\partightenfactor0
+
+\f1\b \cf6 data
+\f0\b0 \cf0  prob1b;\
+   \cf3 set\cf0  residuos1;\
+   semistud_res=residuo/
+\f1\b \cf4 133.07475
+\f0\b0 \cf0 ;\
+   res2=residuo**
+\f1\b \cf4 2
+\f0\b0 \cf0 ;\
+   resabs=abs(residuo);\
+
+\f1\b \cf6 run
+\f0\b0 \cf0 ;\
+
+\f1\b \cf6 proc
+\f0\b0 \cf0  
+\f1\b \cf6 print
+\f0\b0 \cf0  \cf3 data\cf0 =prob1b;\
+
+\f1\b \cf6 run
+\f0\b0 \cf0 ;\
+\
+\
+\pard\pardeftab720\ri992\partightenfactor0
+\cf2 /* Criando gr\'e1ficos de res\'edduos semistudentizado, res\'edduos ao quadrado e em valor absoluto */\cf0 \
+\
+\pard\pardeftab720\ri992\partightenfactor0
+
+\f1\b \cf6 proc
+\f0\b0 \cf0  
+\f1\b \cf6 gplot
+\f0\b0 \cf0  \cf3 data\cf0 =prob1b;\
+   \cf3 plot\cf0  residuo*massa /\cf3 vref\cf0 = -
+\f1\b \cf4 266.14
+\f0\b0 \cf0  -
+\f1\b \cf4 133.07
+\f0\b0 \cf0  
+\f1\b \cf4 0
+\f0\b0 \cf0  
+\f1\b \cf4 133.07
+\f0\b0 \cf0 \
+            
+\f1\b \cf4 266.14
+\f0\b0 \cf0  
+\f1\b \cf4 399.21
+\f0\b0 \cf0  ; \
+   \cf3 plot\cf0  semistud_res*massa; \
+   \cf3 plot\cf0  resabs*massa / \cf3 vref\cf0 = 
+\f1\b \cf4 133.07
+\f0\b0 \cf0 \
+            
+\f1\b \cf4 266.14
+\f0\b0 \cf0  
+\f1\b \cf4 399.21
+\f0\b0 \cf0 ;\
+   \cf3 plot\cf0  res2*massa;\
+   \cf3 plot\cf0  residuo*predito;\
+
+\f1\b \cf6 run
+\f0\b0 \cf0 ;\
+\
+\
+\
+\pard\pardeftab720\ri992\partightenfactor0
+\cf2 /* **** Verificando Normalidade dos Residuos *** */\
+\cf0 \
+\pard\pardeftab720\ri992\partightenfactor0
+
+\f1\b \cf6 proc
+\f0\b0 \cf0  
+\f1\b \cf6 univariate
+\f0\b0 \cf0  \cf3 data\cf0 =residuos1 \cf3 normal\cf0  \cf3 plot\cf0  ;\
+  \cf3 var\cf0   residuo;\
+
+\f1\b \cf6 run
+\f0\b0 \cf0 ;\
+\
+\
+\pard\pardeftab720\ri992\partightenfactor0
+\cf2 /*   **** Teste de Falta de Ajustamento **** */\cf0 \
+\
+\pard\pardeftab720\ri992\partightenfactor0
+
+\f1\b \cf6 proc
+\f0\b0 \cf0  
+\f1\b \cf6 reg
+\f0\b0 \cf0  \cf3 data\cf0 =bib.problema1;\
+   \cf3 model\cf0  taxa=massa / lackfit;\
+
+\f1\b \cf6 run
+\f0\b0 \cf0 ;\
+\
+\
+\pard\pardeftab720\ri992\partightenfactor0
+\cf2 /*  ***  Teste de Brown-Forsythe  ***  */\cf0 \
+\
+\pard\pardeftab720\ri992\partightenfactor0
+
+\f1\b \cf6 proc
+\f0\b0 \cf0  
+\f1\b \cf6 sort
+\f0\b0 \cf0  \cf3 data\cf0 =residuos1 \cf3 out\cf0 =ordenado_x ;\
+  \cf3 by\cf0  massa;\
+
+\f1\b \cf6 run
+\f0\b0 \cf0 ;\
+
+\f1\b \cf6 proc
+\f0\b0 \cf0  
+\f1\b \cf6 print
+\f0\b0 \cf0  \cf3 data\cf0 =ordenado_x;\
+
+\f1\b \cf6 run
+\f0\b0 \cf0 ;\
+
+\f1\b \cf6 proc
+\f0\b0 \cf0  
+\f1\b \cf6 means
+\f0\b0 \cf0  \cf3 data\cf0 =residuos1 \cf3 median\cf0 ;\
+  \cf3 var\cf0  massa;\
+
+\f1\b \cf6 run
+\f0\b0 \cf0 ;\
+\
+\pard\pardeftab720\ri992\partightenfactor0
+\cf2 /*** ou entao **** */\cf0 \
+\
+\pard\pardeftab720\ri992\partightenfactor0
+\cf3 ods\cf0  \cf3 graphics\cf0  \cf3 off\cf0 ;\
+
+\f1\b \cf6 proc
+\f0\b0 \cf0  
+\f1\b \cf6 univariate
+\f0\b0 \cf0  \cf3 data\cf0 =residuos1 \cf3 plot\cf0 ;\
+  \cf3 var\cf0  massa;\
+
+\f1\b \cf6 run
+\f0\b0 \cf0 ;\
+\cf3 ods\cf0  \cf3 graphics\cf0  \cf3 on\cf0 ;\
+\
+\
+
+\f1\b \cf6 data
+\f0\b0 \cf0  residuos2;\
+  \cf3 set\cf0  residuos1;\
+  \cf3 if\cf0  massa le 
+\f1\b \cf4 47.4
+\f0\b0 \cf0  \cf3 then\cf0  grupo=\cf5 '1'\cf0 ;\
+    \cf3 else\cf0   grupo=\cf5 '2'\cf0 ;\
+
+\f1\b \cf6 run
+\f0\b0 \cf0 ;\
+\
+
+\f1\b \cf6 proc
+\f0\b0 \cf0  
+\f1\b \cf6 glm
+\f0\b0 \cf0  \cf3 data\cf0 =residuos2;\
+   \cf3 class\cf0  grupo;\
+   \cf3 model\cf0  residuo = grupo;\
+   \cf3 means\cf0  grupo / \cf3 hovtest\cf0 =BF ;\
+
+\f1\b \cf6 run
+\f0\b0 \cf0 ;\
+\
+\
+\
+\pard\pardeftab720\ri992\partightenfactor0
+\cf2 /*  ***  Teste de Breusch-Pagan  ***   */\cf0 \
+  \
+\cf2 /* Regressao de Residuo\super 2\nosupersub  x Massa  */\cf0 \
+\
+\pard\pardeftab720\ri992\partightenfactor0
+
+\f1\b \cf6 proc
+\f0\b0 \cf0  
+\f1\b \cf6 reg
+\f0\b0 \cf0  \cf3 data\cf0 =prob1b;\
+   \cf3 model\cf0  res2=massa;\
+
+\f1\b \cf6 run
+\f0\b0 \cf0 ;\
+\
+\
+
+\f1\b \cf6 data
+\f0\b0 \cf0  testeBP;\
+   n=
+\f1\b \cf4 19
+\f0\b0 \cf0 ;\
+   SSR_res2=
+\f1\b \cf4 687205578
+\f0\b0 \cf0 ;\
+   SSE=
+\f1\b \cf4 301051
+\f0\b0 \cf0 ;\
+   quiBP=(SSR_res2/
+\f1\b \cf4 2
+\f0\b0 \cf0 )/((SSE/n)**
+\f1\b \cf4 2
+\f0\b0 \cf0 );\
+   pvalor=
+\f1\b \cf4 1
+\f0\b0 \cf0 -probt(quiBP,
+\f1\b \cf4 1
+\f0\b0 \cf0 );\
+   
+\f1\b \cf6 run
+\f0\b0 \cf0 ;\
+\
+
+\f1\b \cf6 proc
+\f0\b0 \cf0  
+\f1\b \cf6 print
+\f0\b0 \cf0  \cf3 data\cf0 =testeBP;\
+
+\f1\b \cf6 run
+\f0\b0 \cf0 ;\
+\
+\pard\pardeftab720\ri0\partightenfactor0
+\cf2 \
+\
+\
+\
+\
+\
+   \cf3 \
+\cf2 /* ****  Infer\'eancia na Regress\'e3o  **** */  \cf3 \
+\cf2 /* ################################### */ \cf0 \
+\pard\pardeftab720\ri992\partightenfactor0
+\cf0 \
+\
+\cf2 /* ***. Intervalos de confianca para os parametros  *** */\cf0 \
+\pard\pardeftab720\ri992\partightenfactor0
+
+\f1\b \cf6 proc
+\f0\b0 \cf0  
+\f1\b \cf6 reg
+\f0\b0 \cf0  \cf3 data\cf0 =bib.problema1; \
+        \cf3 model\cf0  taxa=massa/\cf3 covb\cf0  \cf3 clb\cf0  \cf3 alpha\cf0 =
+\f1\b \cf4 0.10
+\f0\b0 \cf0 ;\
+		
+\f1\b \cf6 run
+\f0\b0 \cf0 ;\
+
+\f1\b \cf6 quit
+\f0\b0 \cf0 ;\
+\
+\
+\
+\pard\pardeftab720\ri992\partightenfactor0
+\cf2 /*  ***  Estimacao da Resposta Media *** */\cf0 \
+\
+\pard\pardeftab720\ri992\partightenfactor0
+
+\f1\b \cf6 proc
+\f0\b0 \cf0  
+\f1\b \cf6 reg
+\f0\b0 \cf0  \cf3 data\cf0 =bib.problema1; \
+        \cf3 model\cf0  taxa=massa/\cf3 clm\cf0  \cf3 alpha\cf0 =
+\f1\b \cf4 0.10
+\f0\b0 \cf0 ;;\
+
+\f1\b \cf6 run
+\f0\b0 \cf0 ;\
+\
+\
+\
+\pard\pardeftab720\ri992\partightenfactor0
+\cf2 /* ***  Predicao Nova Observa\'e7\'e3o. *** */\cf0 \
+\
+\pard\pardeftab720\ri992\partightenfactor0
+
+\f1\b \cf6 proc
+\f0\b0 \cf0  
+\f1\b \cf6 reg
+\f0\b0 \cf0  \cf3 data\cf0 =bib.problema1; \
+        \cf3 model\cf0  taxa=massa/\cf3 cli\cf0  \cf3 alpha\cf0 =
+\f1\b \cf4 0.10
+\f0\b0 \cf0 ;;\
+
+\f1\b \cf6 run
+\f0\b0 \cf0 ;\
+\
+\
+\
+\
+\pard\pardeftab720\ri992\partightenfactor0
+\cf2 /** Criando arquivo com os parametros estimados */\cf0 \
+\
+\pard\pardeftab720\ri992\partightenfactor0
+
+\f1\b \cf6 proc
+\f0\b0 \cf0  
+\f1\b \cf6 reg
+\f0\b0 \cf0  \cf3 data\cf0 =bib.problema1 \cf3 outest\cf0 =reg.param; \
+    \cf3 model\cf0  taxa=massa ; \
+
+\f1\b \cf6 run
+\f0\b0 \cf0 ;\
+\
+
+\f1\b \cf6 proc
+\f0\b0 \cf0  
+\f1\b \cf6 print
+\f0\b0 \cf0  \cf3 data\cf0 =reg.param;\
+
+\f1\b \cf6 run
+\f0\b0 \cf0 ;\
+\
+\
+\pard\pardeftab720\ri992\partightenfactor0
+\cf2 /* Mostrando as matrizes e vetores na \
+      abordagem matricial             */\cf0 \
+\
+\pard\pardeftab720\ri992\partightenfactor0
+
+\f1\b \cf6 proc
+\f0\b0 \cf0  
+\f1\b \cf6 reg
+\f0\b0 \cf0  \cf3 data\cf0 =bib.problema1 ; \
+    \cf3 model\cf0  taxa=massa/\cf3 xpx\cf0  \cf3 i\cf0  ; \
+
+\f1\b \cf6 run
+\f0\b0 \cf0 ;\
+\
+\
+\
+\pard\pardeftab720\ri992\partightenfactor0
+\cf2 /*  ####################################### */\cf0 \
+\pard\pardeftab720\ri992\partightenfactor0
+
+\f2 \cf0 \
+}
