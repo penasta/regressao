@@ -262,6 +262,19 @@ ggplot(dados, aes(x = 1:length(dffits), y = dffits)) +
 # Alguns gráficos do modelo ----
 plot(fit_f2)
 
+confint(fit_f2)
+vif(fit_f2)
+
+# Testando retornar as variáveis originais
+
+fit <- lm(X1~X2+X8+X9+X10+X2:X9+X2:X10,data=dados)
+summary(fit)
+anova <- aov(fit)
+summary(anova)
+
+confint(fit)
+vif(fit)
+
 # --------------------------------------------------------------------------- #
 
 # Testes que estão meio bugados:
