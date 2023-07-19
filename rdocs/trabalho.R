@@ -1,42 +1,146 @@
 if (!require("pacman")) install.packages("pacman")
-p_load(tidyverse,readxl) # pacotes necessários ----
+p_load(tidyverse,readxl,polycor,vegan,caTools,car,quantmod,MASS,corrplot) # pacotes necessários ----
 dados <- read_excel("rdocs/trabalho/DADOS_TRABALHO_2023_1.xlsx", # dados ----
-                                    sheet = "Dados", col_types = c("numeric", 
-                                                                   "numeric", "numeric", "numeric", 
-                                                                   "numeric", "numeric", "numeric", 
-                                                                   "numeric", "numeric", "numeric", 
-                                                                   "numeric", "numeric"))
+                                    sheet = "Dados")
+dados$ID <- factor(dados$ID)
+dados$X1 <- as.numeric(dados$X1)
+dados$X2 <- as.numeric(dados$X2)
+dados$X3 <- as.numeric(dados$X3)
+dados$X4 <- as.numeric(dados$X4)
+dados$X5 <- factor(dados$X5)
+dados$X6 <- as.numeric(dados$X6)
+dados$X7 <- factor(dados$X7)
+dados$X8 <- as.numeric(dados$X8)
+dados$X9 <- factor(dados$X9)
+dados$X10 <- as.numeric(dados$X10)
+dados$X11 <- factor(dados$X11)
+
+cofre <- dados
+#transformando variável ano em idade da casa
+dados$X8 <- dados$X8-1885
+set.seed(150167636)
+dados <- sample_n(cofre,300)
+
+
+#mean(dados$X8)
+
+# transformando x1 em log para tentar normalidade dos residuos
+boxplot(dados$X1)
+dados$lny <- log(dados$X1)
+boxplot(dados$lny) # com a transformação, a variável apresenta menos outliers. talvez assim fique melhor de trabalhar.
+
+boxplot(dados$X2)
+dados$lnX2 <- log(dados$X2)
+boxplot(dados$lnX2)
+
+boxplot(dados$X10)
+dados$lnX10 <- log(dados$X10)
+boxplot(dados$lnX10) # essa segue com bastante outliers, apesar da transformação...
 
 # Modelo contendo todas as variáveis ---- 
-fit <- lm(X1 ~ X2+X3+X4+X5+X6+X7+X8+X9+X10+X11,data=dados)
-
+fit <- lm(lny ~ lnX2+X3+X4+X5+X6+X7+X8+X9+lnX10+X11,data=dados)
+alias(fit) # Existem variáveis linearmente dependentes, ou seja, devem ser eliminadas para o modelo funcionar.
+car::vif(fit)
 # Coeficientes do modelo ---- 
 summary(fit)
 
+# Analisando os coeficientes, notamos um valor r2 muito bom = 0.8463.
+# Além disso, notamos que as variáveis X3 e X5 aparentam realmente não pertencer ao modelo, sob qualquer nível de significância.
+
 # ANOVA do modelo ---- 
 anova <- aov(fit)
-summary(anova)
+summary(anova) # Pela ANOVA, reforçamos que X3 definitivamente deve ser removida do modelo.
+
+fit2 <- lm(lny ~ lnX2+X4+X5+X6+X7+X8+X9+lnX10+X11,data=dados)
+summary(fit2)
+
+anova2 <- aov(fit2)
+summary(anova2)
+
+# o r^2 continua bom, e X7 segue aparentando não ajustar bem ao modelo. Vamos removê-la também.
+
+fit3 <- lm(lny ~ lnX2+X4+X5+X6+X8+X9+lnX10+X11,data=dados)
+summary(fit3)
+
+anova3 <- aov(fit3)
+summary(anova3)
+
+# X5 aparenta ter se ajustado ao modelo, mas X11 aparenta ainda estar bem fora do modelo sob o nível de significância adotado
+
+fit4 <- lm(lny ~ lnX2+X4+X5+X6+X8+X9+lnX10,data=dados)
+summary(fit4)
+
+anova4 <- aov(fit4)
+summary(anova4)
+
+
+# Avaliação do modelo por métodos automáticos ----
+stepwise <- step(fit4,direction = 'both') # stepwise
+backward <- step(fit4,direction = 'backward') # backward
+forward <- step(fit4,direction = 'forward') # forward
+
+summary(stepwise)
+summary(backward)
+summary(forward)
+
+# Removendo X5
+fit5 <- lm(lny ~ lnX2+X4+X6+X8+X9+lnX10,data=dados)
+summary(fit5)
+
+anova5 <- aov(fit5)
+summary(anova5)
+# r quadrado continua excelente
+
+stepwise <- step(fit5,direction = 'both') # stepwise
+summary(stepwise)
+
+# Testando tirar X6
+fit6 <- lm(lny ~ lnX2+X4+X8+X9+lnX10,data=dados)
+summary(fit6)
+
+anova6 <- aov(fit6)
+summary(anova6)
+# r quadrado continua excelente
+
+stepwise <- step(fit6,direction = 'both') # stepwise
+summary(stepwise)
+
+# Testando tirar X4
+fit7 <- lm(lny ~ lnX2+X8+X9+lnX10,data=dados)
+summary(fit7)
+
+anova7 <- aov(fit7)
+summary(anova7)
+# r quadrado continua excelente
+
+stepwise <- step(fit7,direction = 'both') # stepwise
+summary(stepwise)
+
+
+shapiro.test(fit7$residuals)
+qqnorm(fit7$residuals)
+qqline(fit7$residuals)
 
 # Análise dos valores outliers nos resíduos (residuals standard e residuals studentized) ----
 par(mfrow = c(1, 2))
 
-plot(rstudent(fit))
-plot(rstandard(fit))
+plot(rstudent(fit7))
+plot(rstandard(fit7))
 
 # com o ggplot2 ----
-dados$rstudent <- rstudent(fit)
+dados$rstudent <- rstudent(fit7)
 
 ggplot(dados, aes(x = 1:length(rstudent), y = rstudent)) +
   geom_hline(yintercept = 0, linetype = "dashed", color = "red") +
   geom_hline(yintercept = 2, linetype = "dashed", color = "blue") +
   geom_hline(yintercept = -2, linetype = "dashed", color = "blue") +
   geom_point() +
-#  geom_text(aes(label = round(rstudent, 2)), vjust = -1.5) +
+  #  geom_text(aes(label = round(rstudent, 2)), vjust = -1.5) +
   labs(x = "Observações", y = "rstudent") +
   ggtitle("Gráfico de rstudent") +
   theme_minimal()
 
-dados$rstandard <- rstandard(fit)
+dados$rstandard <- rstandard(fit7)
 
 ggplot(dados, aes(x = 1:length(rstandard), y = rstandard)) +
   geom_hline(yintercept = 0, linetype = "dashed", color = "red") +
@@ -52,9 +156,9 @@ ggplot(dados, aes(x = 1:length(rstandard), y = rstandard)) +
 
 # Análise de valores influentes ----
 
-dados$dffits <- dffits(fit)
+dados$dffits <- dffits(fit7)
 
-p <- 11 # número de parâmetros do modelo
+p <- 4 # número de parâmetros do modelo
 n <- nrow(dados) # tamanho da amostra
 
 ggplot(dados, aes(x = 1:length(dffits), y = dffits)) +
@@ -70,13 +174,99 @@ ggplot(dados, aes(x = 1:length(dffits), y = dffits)) +
 # INTERPRETAÇÃO: Aqueles valores maiores que |2*(p/n)^(1/2)| são possíveis valores influentes.
 
 # Alguns gráficos do modelo ----
-plot(fit)
+plot(fit7)
 
-# Avaliação do modelo por métodos automáticos ----
-stepwise <- step(fit,direction = 'both') # stepwise
-backward <- step(fit,direction = 'backward') # backward
-forward <- step(fit,direction = 'forward') # forward
 
-summary(stepwise)
-summary(backward)
-summary(forward)
+# Testando interação nas variáveis selecionadas
+
+
+fit7_2 <- lm(lny ~ lnX2*X8*X9*lnX10,data=dados)
+summary(fit7_2)
+anova7_2 <- aov(fit7_2)
+summary(anova7_2)
+
+stepwise2 <- step(fit7_2,direction = 'both',steps=1000000000) 
+summary(stepwise2)
+anova_s <- aov(stepwise2)
+summary(anova_s)
+# Não gostei da seleção automática, vou fazer cherry-picking das interações que deram significativas na ANOVA
+
+fit_f <- lm(lny~ lnX2+X8+X9+lnX10+lnX2:X9+lnX2:lnX10+lnX2:X8:X9:lnX10,data = dados)
+summary(fit_f)
+anova_f <- aov(fit_f)
+summary(anova_f)
+# Aparentemente a interação quádrupla deixa de ser significativa aqui
+
+fit_f2 <- lm(lny~ lnX2+X8+X9+lnX10+lnX2:X9+lnX2:lnX10,data = dados)
+summary(fit_f2) # r^2 = 0.8648. Muito bom!!
+anova_f2 <- aov(fit_f2)
+summary(anova_f2)
+# Aparentemente, este é o modelo final?
+
+shapiro.test(fit_f2$residuals) # Normalidade bem ok
+qqnorm(fit_f2$residuals)
+qqline(fit_f2$residuals)
+
+# Análise dos valores outliers nos resíduos (residuals standard e residuals studentized) ----
+par(mfrow = c(1, 2))
+
+plot(rstudent(fit_f2))
+plot(rstandard(fit_f2))
+
+# com o ggplot2 ----
+dados$rstudent <- rstudent(fit_f2)
+
+ggplot(dados, aes(x = 1:length(rstudent), y = rstudent)) +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "red") +
+  geom_hline(yintercept = 2, linetype = "dashed", color = "blue") +
+  geom_hline(yintercept = -2, linetype = "dashed", color = "blue") +
+  geom_point() +
+  #  geom_text(aes(label = round(rstudent, 2)), vjust = -1.5) +
+  labs(x = "Observações", y = "rstudent") +
+  ggtitle("Gráfico de rstudent") +
+  theme_minimal()
+
+dados$rstandard <- rstandard(fit_f2)
+
+ggplot(dados, aes(x = 1:length(rstandard), y = rstandard)) +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "red") +
+  geom_hline(yintercept = 2, linetype = "dashed", color = "blue") +
+  geom_hline(yintercept = -2, linetype = "dashed", color = "blue") +
+  geom_point() +
+  #  geom_text(aes(label = round(rstandard, 2)), vjust = -1.5) +
+  labs(x = "Observações", y = "rstandard") +
+  ggtitle("Gráfico de rstandard") +
+  theme_minimal()
+
+# INTERPRETAÇÃO: Aqueles valores maiores que |2| são possíveis outliers.
+
+# Análise de valores influentes ----
+
+dados$dffits <- dffits(fit_f2)
+
+p <- 9 # número de parâmetros do modelo (fiquei meio em dúvida aqui, se são 4; 5; 8 ou 9...)
+n <- nrow(dados) # tamanho da amostra
+
+ggplot(dados, aes(x = 1:length(dffits), y = dffits)) +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "red") +
+  geom_hline(yintercept = 2*(p/n)^(1/2), linetype = "dashed", color = "blue") +
+  geom_hline(yintercept = -(2*(p/n)^(1/2)), linetype = "dashed", color = "blue") +
+  geom_point() +
+  #  geom_text(aes(label = round(dffits, 2)), vjust = -1.5) +
+  labs(x = "Observações", y = "dffits") +
+  ggtitle("Gráfico de dffits") +
+  theme_minimal()
+
+# INTERPRETAÇÃO: Aqueles valores maiores que |2*(p/n)^(1/2)| são possíveis valores influentes.
+
+# Alguns gráficos do modelo ----
+plot(fit_f2)
+
+# --------------------------------------------------------------------------- #
+
+# Testes que estão meio bugados:
+p_load(olsrr)
+test <- ols_step_all_possible(fit7_2)
+plot(test)
+
+test2 <- ols_step_both_p(fit4_2, pent = .05, prem = .3, details = TRUE)

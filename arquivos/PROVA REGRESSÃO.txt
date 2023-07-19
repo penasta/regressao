@@ -1,0 +1,14 @@
+PROVA REGRESSÃO:
+- fazer resumo das fórmulas de regressão múltipla para prova (regressão em termos matriciais) -> olhar programa postado no aprender
+
+- multiplicação matricial
+
+- Interpretar os parâmetros de um modelo ajustado
+
+- Teste de Breusch-Pagan
+
+- Teste de falta de ajustamento (lack of fit): Necessita valores repetidos de X com valores diferentes de Y
+
+- Testar ausência de regressão
+
+- Teste linear geral
