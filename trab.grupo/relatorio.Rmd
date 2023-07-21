@@ -1,0 +1,94 @@
+---
+title: ''
+author: ''
+date: ''
+output:
+  pdf_document: null
+  fig_crop: no
+  html_document:
+    df_print: paged
+subtitle: ''
+highlight: tango
+number_sections: no
+fig_caption: yes
+keep_tex: yes
+includes:
+  in_header: Estilo.sty
+classoption: a4paper
+always_allow_html: yes
+---
+  
+  
+\begin{center}
+{\Large
+  DEPARTAMENTO DE ESTATÍSTICA} \\
+\vspace{0.5cm}
+\begin{figure}[!t]
+\centering
+\includegraphics[width=9cm, keepaspectratio]{logo-UnB.eps}
+\end{figure}
+\vskip 1em
+{\large
+  `r format(Sys.time(), '%d %B %Y')`}
+\vskip 3em
+{\LARGE
+  \textbf{Trabalho em Grupo - Regressão}} \\
+\vskip 1em
+{\Large
+  Profª. Maria Teresa Costa Leão} \\
+\vskip 1em
+{\Large
+  Análise de Regressão Linear} \\
+\vskip 1em
+{\Large
+  Alunos: Bruno Gondim Toledo | Matrícula: 15/0167636 \\
+          Arthur Rodrigues    | Matrícula: \\
+          Lucas Menezes       | Matrícula:} \\
+\vskip 1em
+\end{center}
+
+```{r setup, include=F}
+if (!require("pacman")) install.packages("pacman")
+p_load(tidyverse,readxl,polycor,vegan,caTools,car,quantmod,MASS,corrplot) # pacotes necessários ----
+dados <- read_excel("trabalho/DADOS_TRABALHO_2023_1.xlsx", # dados ----
+                                    sheet = "Dados")
+dados$ID <- factor(dados$ID)
+dados$X1 <- as.numeric(dados$X1)
+dados$X2 <- as.numeric(dados$X2)
+dados$X3 <- as.numeric(dados$X3)
+dados$X4 <- as.numeric(dados$X4)
+dados$X5 <- factor(dados$X5)
+dados$X6 <- as.numeric(dados$X6)
+dados$X7 <- factor(dados$X7)
+dados$X8 <- as.numeric(dados$X8)
+dados$X9 <- factor(dados$X9)
+dados$X10 <- as.numeric(dados$X10)
+dados$X11 <- factor(dados$X11)
+
+#transformando variável ano em idade da casa
+dados$X8 <- dados$X8-1885
+
+# Salvando os dados brutos num 'cofre'
+cofre <- dados
+
+# Setando a seed do sample
+set.seed(150167636)
+
+# Selecionando as 300 obs pro modelo de treino
+dados <- sample_n(cofre,300)
+```
+
+\newpage
+
+# Análise exploratória das variáveis
+
+
+
+# Análise de regressão linear
+
+
+
+# Conclusões
+
+
+

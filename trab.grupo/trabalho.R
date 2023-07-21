@@ -15,10 +15,16 @@ dados$X9 <- factor(dados$X9)
 dados$X10 <- as.numeric(dados$X10)
 dados$X11 <- factor(dados$X11)
 
-cofre <- dados
 #transformando variável ano em idade da casa
 dados$X8 <- dados$X8-1885
+
+# Salvando os dados brutos num 'cofre'
+cofre <- dados
+
+# Setando a seed do sample
 set.seed(150167636)
+
+# Selecionando as 300 obs pro modelo de treino
 dados <- sample_n(cofre,300)
 
 
