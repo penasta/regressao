@@ -1,6 +1,6 @@
 if (!require("pacman")) install.packages("pacman")
 p_load(tidyverse,readxl,polycor,vegan,caTools,car,quantmod,MASS,corrplot) # pacotes necessários ----
-dados <- read_excel("rdocs/trabalho/DADOS_TRABALHO_2023_1.xlsx", # dados ----
+dados <- read_excel("trab.grupo/trabalho/DADOS_TRABALHO_2023_1.xlsx", # dados ----
                                     sheet = "Dados")
 dados$ID <- factor(dados$ID)
 dados$X1 <- as.numeric(dados$X1)
@@ -21,12 +21,14 @@ dados$X8 <- dados$X8-1885
 # Salvando os dados brutos num 'cofre'
 cofre <- dados
 
-# Setando a seed do sample
+# Setando a seed do sample para garantir reprodutibilidade (favor não mexer nisso)
 set.seed(150167636)
 
 # Selecionando as 300 obs pro modelo de treino
 dados <- sample_n(cofre,300)
 
+# Separando o conjunto de dados de teste.
+teste <- anti_join(cofre,dados)
 
 #mean(dados$X8)
 
@@ -35,13 +37,14 @@ boxplot(dados$X1)
 dados$lny <- log(dados$X1)
 boxplot(dados$lny) # com a transformação, a variável apresenta menos outliers. talvez assim fique melhor de trabalhar.
 
+# realizando o mesmo procedimento com as variáveis x2 e x10
 boxplot(dados$X2)
 dados$lnX2 <- log(dados$X2)
 boxplot(dados$lnX2)
 
 boxplot(dados$X10)
 dados$lnX10 <- log(dados$X10)
-boxplot(dados$lnX10) # essa segue com bastante outliers, apesar da transformação...
+boxplot(dados$lnX10) # essa segue com bastante outliers, apesar da transformação. Mas ao menos a distância da mediana aparenta ser menor.
 
 # Modelo contendo todas as variáveis ---- 
 fit <- lm(lny ~ lnX2+X3+X4+X5+X6+X7+X8+X9+lnX10+X11,data=dados)
@@ -123,7 +126,7 @@ stepwise <- step(fit7,direction = 'both') # stepwise
 summary(stepwise)
 
 
-shapiro.test(fit7$residuals)
+shapiro.test(fit7$residuals) # normalidade 'ok' a 5%
 qqnorm(fit7$residuals)
 qqline(fit7$residuals)
 
@@ -164,7 +167,7 @@ ggplot(dados, aes(x = 1:length(rstandard), y = rstandard)) +
 
 dados$dffits <- dffits(fit7)
 
-p <- 4 # número de parâmetros do modelo
+p <- 4 # número de parâmetros do modelo | um pouco de dúvida aqui se realmente são 4...
 n <- nrow(dados) # tamanho da amostra
 
 ggplot(dados, aes(x = 1:length(dffits), y = dffits)) +
@@ -180,7 +183,7 @@ ggplot(dados, aes(x = 1:length(dffits), y = dffits)) +
 # INTERPRETAÇÃO: Aqueles valores maiores que |2*(p/n)^(1/2)| são possíveis valores influentes.
 
 # Alguns gráficos do modelo ----
-plot(fit7)
+plot(fit7) # tem que dar <enter> no Console pra ir mostrando os gráficos
 
 
 # Testando interação nas variáveis selecionadas
@@ -206,10 +209,10 @@ summary(anova_f)
 fit_f2 <- lm(lny~ lnX2+X8+X9+lnX10+lnX2:X9+lnX2:lnX10,data = dados)
 summary(fit_f2) # r^2 = 0.8648. Muito bom!!
 anova_f2 <- aov(fit_f2)
-summary(anova_f2)
+summary(anova_f2) # A tripla não é tãão significante, mas à 0,01 é; então creio que pode ser deixada no modelo.
 # Aparentemente, este é o modelo final?
 
-shapiro.test(fit_f2$residuals) # Normalidade bem ok
+shapiro.test(fit_f2$residuals) # Normalidade bem ok (bem mais convincente que no modelo sem interações)
 qqnorm(fit_f2$residuals)
 qqline(fit_f2$residuals)
 
@@ -266,26 +269,47 @@ ggplot(dados, aes(x = 1:length(dffits), y = dffits)) +
 # INTERPRETAÇÃO: Aqueles valores maiores que |2*(p/n)^(1/2)| são possíveis valores influentes.
 
 # Alguns gráficos do modelo ----
-plot(fit_f2)
+plot(fit_f2) # tem que dar <enter> no console para os gráficos rodarem
 
-confint(fit_f2)
+confint(fit_f2) # intervalo de confiança 95% pros parâmetros do modelo
 vif(fit_f2)
 
 # Testando retornar as variáveis originais
 
 fit <- lm(X1~X2+X8+X9+X10+X2:X9+X2:X10,data=dados)
-summary(fit)
+summary(fit) # r2 bom, x2 e x10 perdem a significância.
 anova <- aov(fit)
-summary(anova)
+summary(anova) # aqui, x2 e x10 são significativos; porém x2:x10 perde a significância à 5% (talvez seja melhor remover essa interação?)
 
 confint(fit)
 vif(fit)
+
+# checando problemas de multicolinearidade
+# variáveis transformadas
+t1 <- data.frame(dados$lnX2,dados$X8,dados$lnX10) # Como X9 não é numérica, não é possível testar correlação.
+cor(t1) # ln X2 tem correlação moderada com X8; e ln X2 tem correlação fraca com ln X10. Correlação de X8 com ln X10 é quase nula.
+
+# Verificando nas variáveis originais
+t2 <- data.frame(dados$X2,dados$X8,dados$X10) # Como X9 não é numérica, não é possível testar correlação.
+cor(t2) # Um padrão muito parecido aqui, apenas a correlação de X8 com ln X10 aumenta um pouco, mas continua fraca.
+
+# Aparentemente, não teremos problemas de multicolinearidade com este modelo.
+
+
+
+
+
+
+
+
+
+
 
 # --------------------------------------------------------------------------- #
 
 # Testes que estão meio bugados:
 p_load(olsrr)
-test <- ols_step_all_possible(fit7_2)
+test <- ols_step_all_possible(fit7_2) # demora bastante pra rodar; num pc bom. resultado confuso. não recomendo rodar.
 plot(test)
 
 test2 <- ols_step_both_p(fit4_2, pent = .05, prem = .3, details = TRUE)
