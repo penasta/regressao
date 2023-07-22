@@ -307,6 +307,31 @@ m0_MSE  <- mean(teste$X1_pred - teste$X1)^2
 # Em ln, o modelo está com um MSE baixíssimo dos valores preditos pros valores reais.
 # desfazendo a transformação, sobe para um valor aparentemente alto, mas que deve ser analisado com calma, pela escala da variável.
 anova(fit_f2)
+# --------------------------------------------------------------------------- #
+p_load(tidyverse,knitr,cowplot,nlme,Rchoice,AICcmodavg,mdscore,questionr,olsrr)
+
+model <- fit_f2
+model2 <- lm(lny ~ lnX2+X8+X9+lnX10,data=dados)
+model3 <- lm(lny ~ lnX2+X4+X5+X6+X8+X9+lnX10,data=dados)
+model4 <- lm(lny ~ lnX2+X4+X8+X9+lnX10,data=dados)
+fullmodel <- lm(lny ~ lnX2*X3*X4*X5*X6*X7*X8*X9*lnX10*X11,data=dados)
+
+ols_mallows_cp(model, fullmodel)
+ols_mallows_cp(model2, fullmodel)
+ols_mallows_cp(model3, fullmodel)
+ols_mallows_cp(model4, fullmodel)
+
+
+model5 <- lm(lny ~ lnX2*X3*X4*X5*X6*X7*X8*X9*lnX10*X11,data=dados)
+summary(model5)
+anova_model5 <- aov(model5)
+summary(anova_model5)
+
+stepwise <- step(model5,direction = 'both',steps=1000000000) # demora muito
+summary(stepwise) # resultado ruim
+anova_s <- aov(stepwise)
+summary(anova_s) # cheio de singularidade, multicolinearidade, overfitting. Horrível. Melhor o que eu tinha selecionado antes mesmo 
+
 
 
 # --------------------------------------------------------------------------- #
