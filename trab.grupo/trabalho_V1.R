@@ -1,7 +1,10 @@
 if (!require("pacman")) install.packages("pacman")
-p_load(tidyverse,readxl,polycor,vegan,caTools,car,quantmod,MASS,corrplot) # pacotes necessários ----
+p_load(tidyverse,readxl,polycor,vegan,caTools,car,quantmod,MASS,corrplot,
+       knitr,cowplot,nlme,Rchoice,AICcmodavg,mdscore,questionr) # pacotes necessários ----
+
 dados <- read_excel("trab.grupo/trabalho/DADOS_TRABALHO_2023_1.xlsx", # dados ----
-                                    sheet = "Dados")
+                    sheet = "Dados")
+
 dados$ID <- factor(dados$ID)
 dados$X1 <- as.numeric(dados$X1)
 dados$X2 <- as.numeric(dados$X2)
