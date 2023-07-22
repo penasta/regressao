@@ -41,9 +41,10 @@ always_allow_html: yes
   Análise de Regressão Linear} \\
 \vskip 1em
 {\Large
-  Alunos: Bruno Gondim Toledo | Matrícula: 15/0167636 \\
-          Arthur Rodrigues    | Matrícula: \\
-          Lucas Menezes       | Matrícula:} \\
+  Alunos: \\
+  Bruno Gondim Toledo | Matrícula: 15/0167636 \\
+  Arthur Rodrigues    | Matrícula: \\
+  Lucas Menezes       | Matrícula:} \\
 \vskip 1em
 \end{center}
 
@@ -67,15 +68,35 @@ dados$X11 <- factor(dados$X11)
 
 #transformando variável ano em idade da casa
 dados$X8 <- dados$X8-1885
+# repare que, da forma que fiz a transformação; quanto maior o novo valor, mais NOVA é a casa. A casa mais antiga irá apresentar valor de X8 = 0; enquanto, neste caso, a mais VELHA irá apresentar valor X8 = 113
+
+#mean(dados$X8)
+
+# transformando x1 em log para tentar normalidade dos residuos
+boxplot(dados$X1)
+dados$lny <- log(dados$X1)
+boxplot(dados$lny) # com a transformação, a variável apresenta menos outliers. talvez assim fique melhor de trabalhar.
+
+# realizando o mesmo procedimento com as variáveis x2 e x10
+boxplot(dados$X2)
+dados$lnX2 <- log(dados$X2)
+boxplot(dados$lnX2)
+
+boxplot(dados$X10)
+dados$lnX10 <- log(dados$X10)
+boxplot(dados$lnX10) # essa segue com bastante outliers, apesar da transformação. Mas ao menos a distância da mediana aparenta ser menor.
 
 # Salvando os dados brutos num 'cofre'
 cofre <- dados
 
-# Setando a seed do sample
+# Setando a seed do sample para garantir reprodutibilidade (favor não mexer nisso)
 set.seed(150167636)
 
 # Selecionando as 300 obs pro modelo de treino
 dados <- sample_n(cofre,300)
+
+# Separando o conjunto de dados de teste.
+teste <- anti_join(cofre,dados)
 ```
 
 \newpage

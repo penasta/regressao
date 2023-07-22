@@ -17,18 +17,7 @@ dados$X11 <- factor(dados$X11)
 
 #transformando variável ano em idade da casa
 dados$X8 <- dados$X8-1885
-
-# Salvando os dados brutos num 'cofre'
-cofre <- dados
-
-# Setando a seed do sample para garantir reprodutibilidade (favor não mexer nisso)
-set.seed(150167636)
-
-# Selecionando as 300 obs pro modelo de treino
-dados <- sample_n(cofre,300)
-
-# Separando o conjunto de dados de teste.
-teste <- anti_join(cofre,dados)
+# repare que, da forma que fiz a transformação; quanto maior o novo valor, mais NOVA é a casa. A casa mais antiga irá apresentar valor de X8 = 0; enquanto, neste caso, a mais VELHA irá apresentar valor X8 = 113
 
 #mean(dados$X8)
 
@@ -45,6 +34,19 @@ boxplot(dados$lnX2)
 boxplot(dados$X10)
 dados$lnX10 <- log(dados$X10)
 boxplot(dados$lnX10) # essa segue com bastante outliers, apesar da transformação. Mas ao menos a distância da mediana aparenta ser menor.
+
+# Salvando os dados brutos num 'cofre'
+cofre <- dados
+
+# Setando a seed do sample para garantir reprodutibilidade (favor não mexer nisso)
+set.seed(150167636)
+
+# Selecionando as 300 obs pro modelo de treino
+dados <- sample_n(cofre,300)
+
+# Separando o conjunto de dados de teste.
+teste <- anti_join(cofre,dados)
+
 
 # Modelo contendo todas as variáveis ---- 
 fit <- lm(lny ~ lnX2+X3+X4+X5+X6+X7+X8+X9+lnX10+X11,data=dados)
@@ -296,13 +298,15 @@ cor(t2) # Um padrão muito parecido aqui, apenas a correlação de X8 com ln X10
 # Aparentemente, não teremos problemas de multicolinearidade com este modelo.
 
 
+# Testando o ajuste do modelo no conjunto de teste
+teste$lnypred <- predict(fit_f2, newdata = teste)
+teste$X1_pred <- exp(teste$lnypred)
 
-
-
-
-
-
-
+ln_m0_MSE  <- mean(teste$lnypred - teste$lny)^2
+m0_MSE  <- mean(teste$X1_pred - teste$X1)^2
+# Em ln, o modelo está com um MSE baixíssimo dos valores preditos pros valores reais.
+# desfazendo a transformação, sobe para um valor aparentemente alto, mas que deve ser analisado com calma, pela escala da variável.
+anova(fit_f2)
 
 
 # --------------------------------------------------------------------------- #
