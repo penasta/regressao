@@ -169,7 +169,7 @@ ggplot(dados, aes(x = 1:length(rstandard), y = rstandard)) +
 
 dados$dffits <- dffits(fit7)
 
-p <- 4 # número de parâmetros do modelo | um pouco de dúvida aqui se realmente são 4...
+p <- 6 # número de parâmetros do modelo | um pouco de dúvida aqui se realmente são 4...
 n <- nrow(dados) # tamanho da amostra
 
 ggplot(dados, aes(x = 1:length(dffits), y = dffits)) +
@@ -206,6 +206,10 @@ fit_f <- lm(lny~ lnX2+X8+X9+lnX10+lnX2:X9+lnX2:lnX10+lnX2:X8:X9:lnX10,data = dad
 summary(fit_f)
 anova_f <- aov(fit_f)
 summary(anova_f)
+
+shapiro.test(fit_f$residuals) 
+qqnorm(fit_f$residuals)
+qqline(fit_f$residuals)
 # Aparentemente a interação quádrupla deixa de ser significativa aqui
 
 fit_f2 <- lm(lny~ lnX2+X8+X9+lnX10+lnX2:X9+lnX2:lnX10,data = dados)
@@ -221,11 +225,11 @@ qqline(fit_f2$residuals)
 # Análise dos valores outliers nos resíduos (residuals standard e residuals studentized) ----
 par(mfrow = c(1, 2))
 
-plot(rstudent(fit_f2))
-plot(rstandard(fit_f2))
+plot(rstudent(fit_f))
+plot(rstandard(fit_f))
 
 # com o ggplot2 ----
-dados$rstudent <- rstudent(fit_f2)
+dados$rstudent <- rstudent(fit_f)
 
 ggplot(dados, aes(x = 1:length(rstudent), y = rstudent)) +
   geom_hline(yintercept = 0, linetype = "dashed", color = "red") +
@@ -237,7 +241,7 @@ ggplot(dados, aes(x = 1:length(rstudent), y = rstudent)) +
   ggtitle("Gráfico de rstudent") +
   theme_minimal()
 
-dados$rstandard <- rstandard(fit_f2)
+dados$rstandard <- rstandard(fit_f)
 
 ggplot(dados, aes(x = 1:length(rstandard), y = rstandard)) +
   geom_hline(yintercept = 0, linetype = "dashed", color = "red") +
@@ -253,9 +257,9 @@ ggplot(dados, aes(x = 1:length(rstandard), y = rstandard)) +
 
 # Análise de valores influentes ----
 
-dados$dffits <- dffits(fit_f2)
+dados$dffits <- dffits(fit_f)
 
-p <- 9 # número de parâmetros do modelo (fiquei meio em dúvida aqui, se são 4; 5; 8 ou 9...)
+p <- 12 # número de parâmetros do modelo (fiquei meio em dúvida aqui, se são 4; 5; 8 ou 9...)
 n <- nrow(dados) # tamanho da amostra
 
 ggplot(dados, aes(x = 1:length(dffits), y = dffits)) +
@@ -271,14 +275,14 @@ ggplot(dados, aes(x = 1:length(dffits), y = dffits)) +
 # INTERPRETAÇÃO: Aqueles valores maiores que |2*(p/n)^(1/2)| são possíveis valores influentes.
 
 # Alguns gráficos do modelo ----
-plot(fit_f2) # tem que dar <enter> no console para os gráficos rodarem
+plot(fit_f) # tem que dar <enter> no console para os gráficos rodarem
 
-confint(fit_f2) # intervalo de confiança 95% pros parâmetros do modelo
-vif(fit_f2)
+confint(fit_f) # intervalo de confiança 95% pros parâmetros do modelo
+vif(fit_f)
 
 # Testando retornar as variáveis originais
 
-fit <- lm(X1~X2+X8+X9+X10+X2:X9+X2:X10,data=dados)
+fit <- lm(X1~X2+X8+X9+X10+X2:X9+X2:X10+X2:X8:X9:X1,data=dados)
 summary(fit) # r2 bom, x2 e x10 perdem a significância.
 anova <- aov(fit)
 summary(anova) # aqui, x2 e x10 são significativos; porém x2:x10 perde a significância à 5% (talvez seja melhor remover essa interação?)
@@ -299,18 +303,18 @@ cor(t2) # Um padrão muito parecido aqui, apenas a correlação de X8 com ln X10
 
 
 # Testando o ajuste do modelo no conjunto de teste
-teste$lnypred <- predict(fit_f2, newdata = teste)
+teste$lnypred <- predict(fit_f, newdata = teste)
 teste$X1_pred <- exp(teste$lnypred)
 
 ln_m0_MSE  <- mean(teste$lnypred - teste$lny)^2
 m0_MSE  <- mean(teste$X1_pred - teste$X1)^2
 # Em ln, o modelo está com um MSE baixíssimo dos valores preditos pros valores reais.
 # desfazendo a transformação, sobe para um valor aparentemente alto, mas que deve ser analisado com calma, pela escala da variável.
-anova(fit_f2)
+
 # --------------------------------------------------------------------------- #
 p_load(tidyverse,knitr,cowplot,nlme,Rchoice,AICcmodavg,mdscore,questionr,olsrr)
 
-model <- fit_f2
+model <- fit_f
 model2 <- lm(lny ~ lnX2+X8+X9+lnX10,data=dados)
 model3 <- lm(lny ~ lnX2+X4+X5+X6+X8+X9+lnX10,data=dados)
 model4 <- lm(lny ~ lnX2+X4+X8+X9+lnX10,data=dados)
@@ -326,19 +330,6 @@ model5 <- lm(lny ~ lnX2*X3*X4*X5*X6*X7*X8*X9*lnX10*X11,data=dados)
 summary(model5)
 anova_model5 <- aov(model5)
 summary(anova_model5)
-
-stepwise <- step(model5,direction = 'both',steps=1000000000) # demora muito
-summary(stepwise) # resultado ruim
-anova_s <- aov(stepwise)
-summary(anova_s) # cheio de singularidade, multicolinearidade, overfitting. Horrível. Melhor o que eu tinha selecionado antes mesmo 
-
-
+ols_mallows_cp(model5, fullmodel)
 
 # --------------------------------------------------------------------------- #
-
-# Testes que estão meio bugados:
-p_load(olsrr)
-test <- ols_step_all_possible(fit7_2) # demora bastante pra rodar; num pc bom. resultado confuso. não recomendo rodar.
-plot(test)
-
-test2 <- ols_step_both_p(fit4_2, pent = .05, prem = .3, details = TRUE)
