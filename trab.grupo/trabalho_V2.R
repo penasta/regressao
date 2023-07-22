@@ -1,6 +1,6 @@
 if (!require("pacman")) install.packages("pacman")
 p_load(tidyverse,readxl,polycor,vegan,caTools,car,quantmod,MASS,corrplot,
-       knitr,cowplot,nlme,Rchoice,AICcmodavg,mdscore,questionr) # pacotes necessários ----
+       knitr,cowplot,nlme,Rchoice,AICcmodavg,mdscore,questionr,waterfalls) # pacotes necessários ----
 
 dados <- read_excel("trab.grupo/trabalho/DADOS_TRABALHO_2023_1.xlsx", # dados ----
                     sheet = "Dados")
@@ -591,7 +591,6 @@ cascata$Variaveis <- factor(cascata$Variaveis, levels = c("lnX2","X8","X9","lnX1
 
 
 # "Porcetagem de explicação por variável"
-library(waterfalls)
 waterfall(values = cascata$Valores,
           labels = cascata$Variaveis)
 
