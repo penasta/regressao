@@ -1,0 +1,150 @@
+# Descrição das trasnformações das variáveis numéricas do modelo:
+
+
+VARIAVEL X1 X2 e X10 (numéricas do modelo)_________________________________________________________________
+
+Inicialmente a variável resposta continha uma quantidade considerável de outliers,
+ contudo, depois de aplicarmos o logaritmo natural, se comportou de maneira muito mais estável.
+ O mesmo procedimento foi aplicado tanto para a segunda variável (X2) quanto para a décima variável X10 
+e foram obtidos resultados semelhantes. Houveram transformações que não obtiveram outliers algum.
+
+
+# Narrativa da seleção de variáveis:_______________________________________________________________________
+
+
+Após a análise descritiva das variáveis gerar uma breve compreensão de como as variáveis pode se comportar, 
+foram testadas as possibilidades de modelos a partir das combinações e avaliações de como as variáveis contribuem
+ na predição da variável resposta. Ao entrar nessa etapa, foi criado um modelo contendo todas as possíveis 
+variáveis do banco de dados com o objetivo de inicialmente compreender quais são as possíveis variáveis que possuem
+potencial de explicação.
+
+
+Dado este "primeiro chute" estratégico, foi percebido um valor de R2= 0.8463, o que é muito bom sob o olhar de
+predição e explicação do modelo. Contudo, duas variáveis, X3 e X5, não se mostraram ter muita influência no resultado
+de X1 visto que, obtiveram respectivamente os seguintes p-valores, 0.982 e 0.937, que são considerados irrelevantes
+a quaisquer níveis de significância existentes. Ao realizar a analise de variância (ANOVA) é possível confirmar 
+ainda com mais evidência de que X3 definitivamente não está no modelo contendo um p-valor de 0.54155, maior do que
+o p-valor de X5, sendo 0.00501. Dessa forma, X3 foi retirado do modelo.
+
+Com a nova versão, sem o X5, foi realizada o mesmo procedimento de avaliação, onde resultou em X5 com o mesmo p-valor
+dentro do modelo de regressão dito anteriormente, de 0.937. Contudo, ao realizar a ANOVA verifica-se que a variável 
+X7 possui o maior p-valor, mostrando-se não relevante para o modelo a níveis altos de significância. Pontanto, foi
+retirada do modelo. 
+
+
+Ao realizar a terceira modulagem, vemos que X5 parece estar se ajustado ao modelo. Ao realizar a ANOVA contudo vemos
+ que a variável X11 parece se destoar muito dentre as demais e não exsitem motivos para mantê-la visto que não possui
+muito poder de explicação no modelo.
+
+
+O novo modelo, que contem todas as variáveis menos X5, X7 e X11 foi realizada uma avaliação por métodos automáticos,
+visto que ao realizar a ANOVA do modelo novo vemos que todas as variáveis possuem significância ao nível de 5%.
+A análise por stepwise foi resultou no modelo: lny ~ lnX2 + X4 + X8 + X9 + lnX10. 
+A análise por backward foi resultou no modelo: lny ~ lnX2 + X4 + X8 + X9 + lnX10
+A análise por forward foi resultou no modelo: lny ~ lnX2 + X4 + X5 + X6 + X8 + X9 + lnX10
+
+Foi notado que para os três métodos de R2 os resultados de R2 ponderado estão muito próximos, contudo o R2 da análise
+forward possui menor índice e contém uma variável a mais quando comparada com os outros dois métodos. Assim, a variável
+excedente da análise forward, X5, foi retirada do modelo.
+
+Com a nova versão do modelo, sem a variável X5, foi realizada a análise do modelo de regressão e sua respectiva ANOVA.
+Observa-se que na ANOVA todos os p-valores se mostram signifcantes contudo no modelo de regressão as variáveis X4 e
+X6 não possuem tanta relevância. A partir dessa percepção foi realizada mais uma avaliação automática pelo método de
+stepwise, onde foi indentificado que a variável X6 pode ser removida do modelo e ainda sim manter uma ótima explicação,
+visto que o valor de R2ponderado observado foi de 0.8472.
+
+A tabela de regressão linear gerada a partir do modelo anterior, sem o X6, foi notado que a variável X4 parece se
+destoar muito ao comparar o p-valor dela com as demais. Assim, foi testado retirá-la do modelo para avaliar as possíveis
+interferências na explicação. Ao realizar o teste, percebe-se um valor de R2 ponderado muito bom, sendo 0.8466, e a
+partir dessa medida a variável X4 foi desconsiderada. Com o objetivo de gerar uma maior garantia foi testado uma 
+possível redução do modelo pelo método de avaliação automático stepwise e notou-se um bom comportamente das variáveis
+do modelo. Por fim, foram validadas as variáveis explitivas para o MRLM.
+
+# ANALISE DE CURVATURA E SUAS INTERAÇÕES:___________________________________________________________________
+
+
+
+Foi testada as interações das variáveis selecionadas, lnX2, X8, X9 e lnX10. Algumas intereções se mostraram 
+importantes, como lnX2:X9, lnX2:lnX10  e  lnX2:X8:X9:lnX10 e foram acrescidas no modelo. Por consequência o novo
+modelo é lny ~ lnX2+X8+X9+lnX10+lnX2:X9+lnX2:lnX10+lnX2:X8:X9:lnX10.
+
+Com o novo modelo em mãos, foi realizada a análise de regressão linear e sua respectiva ANOVA, resultando em uma
+aceitação boa de todas as componentes do modelo assim como um acrescimo no valor de R2 ao acrescentar as interações
+significantes das variávesis, resultando no novo valor de R2 ponderado sendo 0.8673.
+
+Ao realizar a análise de resíduos do novo modelo, vemos que existe uma aderência a normalidade com p-valor de 0.3282,
+satisfazendo assim a hipótese de normalidade dos resíduos.
+
+
+# TESTE PARA POSSÍVEL MELHORA:_______________________________________________________________________________
+
+
+
+
+
+
+# ANÁLISE GRÁFICA____________________________________________________________________________________________
+
+
+Na análise de resíduos do modelo, foi contabilizado pela studentização e pela normalização com o objetivo de
+identificar valores outliers e foram notadas algumas possíveis observações como outliers. Dado o gatilho, foi 
+feita em seguida a análise de valores influentes, que possibilita a identificação das observações que se distanciam
+da abordagem que o modelo propõe.
+
+(gráficos)
+
+# TESTE DE RETORNO__________________________________________________________________________________________
+
+Foi testada a possibilidade de retorno das variáveis do modelo ao seu formato original, uma vez que X2 e X10 foram 
+manipuladas na escala de logaritmo natural. O modelo original possui um ótimo valor de R2 ajustado de 0.9666.
+Contudo X10 perde sua significância, assim como a interação entre X2 e X10 também.
+
+# CHECANDO MULTICOLINEARIDADE_______________________________________________________________________________
+
+Foram geradas as matrizes de correlação entre as variáveis numericas do modelo transformado e o das variáveis 
+originais onde não foi notada grandes evidências de multicolinearidade entre as variáveis. A única diferença seria
+quanto a correlação entre X8 e lnX10, onde no modelo de variáveis originais ela é um pouco maior, saindo de -0.07
+para -0.12, ou seja, ainda que exista diferença não é algo significante. A mesma situação acontece com lnX2 e X8.
+
+# TESTANDO O AJUSTE DO MODELO NO CONJUNTO DE TESTE__________________________________________________________
+
+Em ln, o modelo transformado está com um MSE baixíssimo dos valores preditos pros valores reais.
+Ao desfazer a transformação e retornar ao modelo original, o MSE sobe para um valor aparentemente alto, 
+mas que deve ser analisado com calma, pela escala da variável.
+
+# VALIDAÇÃO DO MODELO PELOS COEFICIENTES DE MALLOW__________________________________________________________
+
+
+Foi desenvolvido, para princípio de comparação pelo coeficiente de Mallow 4 modelos comparativos, onde o primeiro
+é o modelo final gerado com a transformação, o segundo modelo seria o modelo final sem as transformações e em 
+seguida os mesmos dois modelos, com e sem a trasnformação, sem as interações das variáveis.
+
+O primeiro modelo, com a trasnformação e com as interações possui o coeficiente de 14.27, sendo um resultado muito
+bom, visto que o valor esperado para o coeficiente de Mallows seria o número de variáveis + 1, sendo assim o valor
+esperado igual a 12. O segundo modelo, que possui todas as variáveis e suas interações sem a tranformação logaritmica
+nas variáveis numéricas apresentou o valor de 7.71, sendo um pouco mais distante do que o esperado quando comparado
+com o modelo trasnformado completo.
+
+Agora, quanto aos modelos que compreendem apenas as variáveis de maneira "crua", sem suas interações pertinentes, possuem
+ valores do coeficiente como 61.88 e 96.06 para o modelo com a trasnformação e sem a transformação, respectivamente. Isso mostra
+o quanto as interações são pertinentes para uma eventual convergência e acertabilidade do modelo desenvolvido.
+
+# ANALISE DE ACRESCIMO_______________________________________________________________________________________
+
+A partir do gatilho que as interações mostraram ter na análise de validação pelo coeficiente de Mallows, foi análisado
+o acrescimo de explicação que cada uma das variáveis do modelo podem ter, sendo representada pelo gráfico de cascata abaixo:
+
+( Gráfico de cascata )
+
+Em contrapartida, foi análisado o p-valor do modelo conforme é acrescentada cada uma das variáveis. A partir do momento
+em que cruzamos as informações dos dois gráficos, vemos que conforme acrescentamos as variáveis obtemos uma explicação
+maior assim como um maior controle dos resíduos no que diz a convergência a normalidade. A variáveis lnX2 possui uma
+grande importância na explicação do modelo, contudo seus resíduos são nada controlados. Conforme acrescentamos as variáveis
+é observado um maior p-valor no teste de normalidade dos resíduos. A partir do momento em que introduzimos as interações
+das variáveis pertinentes do modelo, vemos que os resíduos se mostram muito mais controlados, demonstrando assim que
+as interações, apesar de não explicarem muito em termos de R2 ponderado, possuem um poder gigantesco para controlar
+a normalidade dos resíduos.
+
+#__________________________________________________________________________________________________________
+
+

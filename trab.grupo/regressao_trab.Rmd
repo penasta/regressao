@@ -1,0 +1,461 @@
+---
+title: "Trabalho regressao"
+author: "Arthur Rodrigues Pereira Carvalho"
+date: "2023-07-24"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE)
+```
+
+
+```{r}
+if (!require("pacman")) install.packages("pacman")
+p_load(tidyverse,readxl,polycor,vegan,caTools,car,quantmod,MASS,corrplot,
+       knitr,cowplot,nlme,Rchoice,AICcmodavg,mdscore,questionr,waterfalls)
+```
+
+
+```{r}
+dados <- read_excel("C://Users//User//Downloads//DADOS_TRABALHO_2023_1.xlsx", # dados ----
+                    sheet = "Dados")
+
+dados$ID <- factor(dados$ID)
+dados$X1 <- as.numeric(dados$X1)
+dados$X2 <- as.numeric(dados$X2)
+dados$X3 <- as.numeric(dados$X3)
+dados$X4 <- as.numeric(dados$X4)
+dados$X5 <- factor(dados$X5)
+dados$X6 <- as.numeric(dados$X6)
+dados$X7 <- factor(dados$X7)
+dados$X8 <- as.numeric(dados$X8)
+dados$X9 <- factor(dados$X9)
+dados$X10 <- as.numeric(dados$X10)
+dados$X11 <- factor(dados$X11)
+```
+
+\textbf{Tamanho da casa}
+
+Para analisar o comportamento da variável $X_{2}$(tamanho da casa) dispõe-se o gráfico e o quadro a seguir:
+
+
+```{r}
+#x2 - Tamanho da casa
+
+
+ggplot(dados) +
+  aes(x = "", y = X2) +  
+  geom_boxplot(fill = "#0000FF", width = 0.5) +
+  stat_summary(
+    fun = "mean", geom = "point", shape = 23, size = 3, fill = "white"
+  ) +
+  labs(x="",y="Tamanho da casa(pés quadrados)") +
+  theme_bw() +
+   theme(axis.title.y=element_text(colour="black", size=10),
+        axis.title.x = element_text(colour="black", size=10),
+        axis.text = element_text(colour = "black", size=9.5),
+        panel.border = element_blank(),
+        axis.line = element_line(colour = "black"),
+    plot.title = element_text(size = 12, face = "plain", hjust = 0.5),
+    plot.title.position = "plot") +
+   ggtitle("Figura 1: Gráfico boxplot do tamanho da casas(pés quadrados)")
+
+```
+
+
+```{r}
+library(knitr)
+library(kableExtra)
+
+library(xtable)
+resumo <- round(summary(dados$X2),2)
+desvio_padrao <- round(sd(dados$X2),2)
+
+
+tabela_resumo <- data.frame(
+  Estatística = c("Minimo", "Primeiro Quartil.", "Mediana", "Média", "Terceiro Quartil", "Maximo", "Desvio Padrão"),
+  Valor = c(980,  1701, 2061, 2261, 2636, 5032, desvio_padrao)
+)
+
+kable(tabela_resumo, caption = "Quadro 1: Medidas Resumo tamanho das casas (pés quadrados)") %>%
+  kable_styling() %>%
+  column_spec(1, bold = TRUE)
+
+```
+
+
+Com base na Figura 1 e no Quadro 1, conclui-se que a média de tamanho das casas é de aproximadamente 2261 pés quadrados.Ademais, o valor mínimo é de 980 pés quadrados e o valor máximo é de 5032 pés quadrados, mostrando que a amostra abrange desde casas pequenas até propriedades bastante extensas.
+
+Nesse sentido, destaca-se a amplitude do tamanho das casas, que é a diferença entre o maior e o menor valor observado. Neste caso, a amplitude é de 4052 pés quadrados, mostrando uma grande variação dos no tamanho das casas que pode ser explicada pelo desvio padrão, que é de aproximadamente 711,07 pés quadrados.
+
+Além disso, a mediana, por sua vez, é de 2061 pés quadrados, indicando uma assimetria à direita na distribuição dos dados,visto que a média é maior que a mediana. Essa assimetria pode ser explicada pela presença de valores maiores (outliers) que puxam a média para cima.
+
+\textbf{Número de quartos}
+
+A análise descritiva da variável $X_{3}$ (Número de quartos) é ilustrada na figura abaixo, apresentando um gráfico de colunas. Esse gráfico oferece uma representação visual dos dados relacionados ao número de quartos nas residências estudadas.
+```{r}
+#Número de quartos(X3)
+
+dados1 = dados %>% group_by(X3) %>% tally() %>%
+  mutate(freq1=round((n/sum(n)*100),2))%>%
+  mutate(freq = gsub("\\.", ",",freq1) %>% paste("%",sep = ""),
+         label = str_c(n," (", freq, ")") %>% str_squish())
+
+ ggplot(dados1,aes(x =X3, y = n,label=label)) + 
+  geom_col(stat = "identity", fill = "#0000FF", width = 0.7) + 
+  geom_text(position = position_dodge(width = .9),
+            vjust = -0.5,size = 3)+
+  labs(x = "Número de quartos", y = "Frequência") +
+  scale_x_continuous(breaks = seq(min(dados$X6), max(dados$X6), by = 1)) +
+  theme_bw()+
+   theme(axis.title.y=element_text(colour="black", size=10),
+        axis.title.x = element_text(colour="black", size=10),
+        axis.text = element_text(colour = "black", size=9.5),
+        panel.border = element_blank(),
+        axis.line = element_line(colour = "black"),
+    plot.title = element_text(size = 12, face = "plain", hjust = 0.5),
+    plot.title.position = "plot") +
+  ggtitle("Figura 2: Gráfico de colunas do número de quartos")
+
+```
+
+A partir da Figura 2, observa-se que a maioria das casas construídas entre os anos de 1885 e 1998 possuía entre 3 e 4 quartos, representando quase 73\% do total. Além disso, foi identificado que apenas 1 casa (0,19\%) não possuía nenhum quarto, enquanto em apenas 3 casas (0,57\%) foram encontrados sete quartos
+
+\textbf{Número de banheiros}
+
+Este estudo visa analisar a variável $X_{4}$, que representa o número de banheiros em uma casa. Para facilitar a compreensão dos dados, a figura a seguir apresenta uma visualização gráfica da distribuição dessa variável.
+
+```{r}
+#Numero de banheiros (x4)
+dados1 = dados %>% group_by(X4) %>% tally() %>%
+  mutate(freq1=round((n/sum(n)*100),2))%>%
+  mutate(freq = gsub("\\.", ",",freq1) %>% paste("%",sep = ""),
+         label = str_c(n," (", freq, ")") %>% str_squish())
+
+ ggplot(dados1,aes(x =X4, y = n,label=label)) + 
+  geom_col(stat = "identity", fill = "#0000FF", width = 0.7) + 
+  geom_text(position = position_dodge(width = .9),
+            vjust = -0.5,size = 3)+
+  labs(x = "Número de banheiros", y = "Frequência") +
+  scale_x_continuous(breaks = seq(min(dados$X6), max(dados$X6), by = 1)) +
+  theme_bw()+
+   theme(axis.title.y=element_text(colour="black", size=10),
+        axis.title.x = element_text(colour="black", size=10),
+        axis.text = element_text(colour = "black", size=9.5),
+        panel.border = element_blank(),
+        axis.line = element_line(colour = "black"),
+    plot.title = element_text(size = 12, face = "plain", hjust = 0.5),
+    plot.title.position = "plot") +
+  ggtitle("Figura 3: Gráfico de colunas do número de banheiros")
+
+```
+Com base na Figura 3, podemos observar que a maioria das casas construídas entre os anos de 1885 e 1998 possui entre 2 e 3 banheiros, representando 66,28% do total. Em contrapartida, 16\% das casas possuem 4 banheiros, enquanto 13,6\% contam com apenas 1 banheiro. É importante destacar que uma parcela inferior a 0,5\% possui entre 6 e 7 banheiros, e somente 1 casa (0,19\%) não possui banheiro.
+
+\textbf{Presença de ar condicionado}
+
+A análise descritiva da variável $X_{5}$, que representa a presença(ou não) de ar condicionado nas casas, é ilustrada através da figura apresentada abaixo, a qual consiste em um gráfico de setor.
+```{r}
+#Presença de ar condicionado(x5)
+
+dados1 = dados
+library(plyr)
+dados1$X5 = revalue(dados1$X5,c("0"="Não","1"="Sim"))
+
+#Frequencia absoluta e relativa
+freq_table <- table(dados1$X5)
+absolute_freq <- as.vector(freq_table)
+relative_freq <- absolute_freq / sum(absolute_freq) * 100
+
+# data frame frequencias
+freq_df <- data.frame(Categoria = names(freq_table),
+                      absolute_freq,
+                      relative_freq)
+
+# grafico de setor
+ggplot(freq_df, aes(x = "", y = absolute_freq, fill = Categoria)) +
+  geom_bar(stat = "identity", width = 1) +
+  geom_text(aes(label = paste0(absolute_freq, " (", sprintf("%.1f", relative_freq), "%)")),
+            position = position_stack(vjust = 0.5), size = 4) +
+  coord_polar("y") +
+  scale_fill_manual(values = c("#FF6600", "#0000FF")) +
+  theme_void() +
+  theme(plot.title = element_text(size = 12, face = "plain", hjust = 0.5),
+    plot.title.position = "plot")+
+  ggtitle("Figura 4: Gráfico de setor sobre a presença(ou não) de ar condicionado nas casas")
+```
+
+Diante da figura 4, constata-se que 83\% das casas construídas nos anos de 1885 a 1998 não tinham ar condicionado.
+
+\textbf{Tamanho da garagem}
+
+Nesta análise descritiva, vamos examinar a variável $X_{6}$, que representa o tamanho da garagem, ou seja, o número de carros que podem ser guardados na garagem. A seguir, apresenta-se a figura que ilustra essa variável.
+```{r}
+#x6 Tamanho da garagem
+
+dados1 = dados %>% group_by(X6) %>% tally() %>%
+  mutate(freq1=round((n/sum(n)*100),2))%>%
+  mutate(freq = gsub("\\.", ",",freq1) %>% paste("%",sep = ""),
+         label = str_c(n," (", freq, ")") %>% str_squish())
+
+ ggplot(dados1,aes(x =X6, y = n,label=label)) + 
+  geom_col(stat = "identity", fill = "#0000FF", width = 0.7) + 
+  geom_text(position = position_dodge(width = .9),
+            vjust = -0.5,size = 3)+
+  labs(x = "Tamanho da garagem", y = "Frequência") +
+  scale_x_continuous(breaks = seq(min(dados$X6), max(dados$X6), by = 1)) +
+  theme_bw()+
+   theme(axis.title.y=element_text(colour="black", size=10),
+        axis.title.x = element_text(colour="black", size=10),
+        axis.text = element_text(colour = "black", size=9.5),
+        panel.border = element_blank(),
+        axis.line = element_line(colour = "black"),
+    plot.title = element_text(size = 12, face = "plain", hjust = 0.5),
+    plot.title.position = "plot") +
+  ggtitle("Figura 5: Gráfico de colunas do tamanho da garagem das casas")
+```
+De acordo com a Figura 5, conclui-se que  a maioria das casas construídas (cerca de 67,62%) tem espaço para aproximadamente 2 carros em suas garagens. Além disso, cerca de 20% das casas têm capacidade para acomodar 3 carros.Por outro lado, casas com espaço para apenas 1 carro representam menos de 10% do total. Destaca-se também as casas com espaço para 4, 5 ou 7 carros que são ainda mais raras, compreendendo menos de 1% do total cada.
+
+Vale a pena ressaltar que existem mais casas sem garagem (cerca de 1,34% do total) do que casas com capacidade para comportar entre 4 a 7 carros juntas.
+
+\textbf{Presença de piscina}
+
+Com o objetivo de examinar a variável $X_{7}$, que indica se as casas possuem piscina ou não, foi realizada uma análise descritiva, cujos resultados são apresentados na figura abaixo.
+```{r}
+#x7 Piscina
+
+dados1 = dados
+library(plyr)
+dados1$X7 = revalue(dados1$X7,c("0"="Não","1"="Sim"))
+
+#Frequencia absoluta e relativa
+freq_table <- table(dados1$X7)
+absolute_freq <- as.vector(freq_table)
+relative_freq <- absolute_freq / sum(absolute_freq) * 100
+
+# data frame frequencias
+freq_df <- data.frame(Categoria = names(freq_table),
+                      absolute_freq,
+                      relative_freq)
+
+# grafico de setor
+ggplot(freq_df, aes(x = "", y = absolute_freq, fill = Categoria)) +
+  geom_bar(stat = "identity", width = 1) +
+  geom_text(aes(label = paste0(absolute_freq, " (", sprintf("%.1f", relative_freq), "%)")),
+            position = position_stack(vjust = 0.5), size = 4) +
+  coord_polar("y") +
+  scale_fill_manual(values = c("#FF6600", "#0000FF")) +
+  theme_void() +
+   theme(plot.title = element_text(size = 12, face = "plain", hjust = 0.5),
+    plot.title.position = "plot")+
+  ggtitle("Figura 6: Gráfico de setor sobre a presença(ou não) de ar piscina nas casas")
+
+```
+
+Atráves da Figura 6, constata-se que mais de 90\% das casas construídas entre os anos de 1885 e 1998 possuem piscinas, ao mesmo tempo que apenas 6,9\% não usufruem disso.
+
+\textbf{Idade das casas}
+
+A fim de examinar a distribuição da variável $X_{8}$, que representa a idade das casas em anos, foram elaborados um boxplot e um quadro com medidas resumo.
+```{r}
+#x8 Ano de construção
+
+#transformando variável ano em idade da casa
+
+dados$X8 <- 1998-dados$X8
+
+ggplot(dados) +
+  aes(x = "", y = X8) + 
+  geom_boxplot(fill = "#0000FF", width = 0.5) +
+  stat_summary(
+    fun = "mean", geom = "point", shape = 23, size = 3, fill = "white"
+  ) +
+ labs(x="", y="Idade da casa (anos)") +
+  theme_bw() +
+   theme(axis.title.y=element_text(colour="black", size=10),
+        axis.title.x = element_text(colour="black", size=10),
+        axis.text = element_text(colour = "black", size=9.5),
+        panel.border = element_blank(),
+        axis.line = element_line(colour = "black"),
+    plot.title = element_text(size = 12, face = "plain", hjust = 0.5),
+    plot.title.position = "plot") +
+   ggtitle("Figura 7: Gráfico boxplot da idade das casas(anos)")
+summary(dados$X8)
+sd(summary(dados$X8))
+```
+
+```{r}
+resumo <- round(summary(dados$X8),2)
+desvio_padrao <- round(sd(dados$X8),2)
+
+
+tabela_resumo <- data.frame(
+  Estatística = c("Minimo", "Primeiro Quartil.", "Mediana", "Média", "Terceiro Quartil", "Maximo", "Desvio Padrão"),
+  Valor = c(0,17, 32, 31.1, 42, 113, desvio_padrao)
+)
+
+kable(tabela_resumo, caption = "Quadro 2: Medidas Resumo  da idade das casas(anos)") %>%
+  kable_styling() %>%
+  column_spec(1, bold = TRUE)
+```
+
+Analisando a Figura 7 e no Quadro 2 constata-se que a idade média das casas e de 31,1 anos. Além disso,
+a casa mais nova tem 0 anos, ou seja, foi construída em 1998, enquanto que a casa mais velha tem 113 anos (1885). No entanto, a presença de outliers no limite inferior, pode estar puxando a média para baixo, tornando-a menor que a mediana. Nesse caso, a média não é a melhor medida de tendência central, pois é influenciada por valores extremos. Dessa forma, a mediana é a melhor medida para representar a idade média das casas, já que não é afetada por outliers.
+
+Nesse contexto, a mediana está em torno de 32 anos, ou seja, metade das casas tem uma idade menor ou igual a 32 anos, enquanto a outra metade tem uma idade maior ou igual a esse valor. Vale ressaltar também que o valor do terceiro quartil é de 42 anos, indicando que 75% das casas têm uma idade menor ou igual a 42 anos. 
+
+A amplitude dos da idade das casas é de 113 anos, mostrando uma grande variação da idade que é explicada pelo O desvio padrão de 38.99 anos, indicando uma  dispersão das idades em relação à média.
+
+
+
+\textbf{Qualidade da construção}
+
+Com o intuito de analisar a variável $X_{9}$, que representa a qualidade da construção,dispõe-se a figura abaixo:
+```{r}
+#x9 Qualidade da construção 
+
+
+dados1 = dados
+dados1$X9 = revalue(dados1$X9,c("1"="Alta qualidade","2"="Média qualidade","3"="Baixa qualidade"))
+
+#Frequencia absoluta e relativa
+freq_table <- table(dados1$X9)
+absolute_freq <- as.vector(freq_table)
+relative_freq <- absolute_freq / sum(absolute_freq) * 100
+
+# data frame frequencias
+freq_df <- data.frame(Categoria = names(freq_table),
+                      absolute_freq,
+                      relative_freq)
+
+
+ggplot(freq_df, aes(x = fct_reorder(Categoria,absolute_freq, .desc=T), y = absolute_freq)) +
+  geom_col(fill = "#0000FF") +
+  geom_text(aes(label = paste0(absolute_freq, " (", sprintf("%.1f", relative_freq), "%)")),
+            position = position_dodge(width = 0.9), vjust = -0.5, size = 3, color = "black") +
+  labs(x = "Qualidade da construção",
+       y = "Frequência absoluta") +
+  theme_minimal() +
+  theme(axis.title.y=element_text(colour="black", size=10),
+         axis.title.x = element_text(colour="black", size=10),
+         axis.text = element_text(colour = "black", size=9.5),
+         panel.border = element_blank(),
+         axis.line = element_line(colour = "black"),
+         plot.title = element_text(size = 12, face = "plain", hjust = 0.5),
+    plot.title.position = "plot")+
+   ggtitle("Figura 8: Gráfico de colunas da qualidade da construção das casas")
+```
+Baseando-se na Figura 8, comprova-se que mais da metade das casas (55,6\%) foram construídas com uma qualidade média. Enquanto isso, 31\% das casas têm uma baixa qualidade e somente 13\% delas são consideradas de alta qualidade.
+
+\textbf{Tamanho do terreno}
+
+Com o propósito de realizar uma análise descritiva da variável $X_{10}$ que representa o tamanho do terreno (pés quadrados), foram apresentadas a figura e o quadro abaixo:
+```{r}
+#x10 Tamanho do terreno
+
+
+ggplot(dados) +
+  aes(x = "", y = X10) +  # Usamos uma string vazia para criar um único boxplot
+  geom_boxplot(fill = "#0000FF", width = 0.5) +
+  stat_summary(
+    fun = "mean", geom = "point", shape = 23, size = 3, fill = "white"
+  ) +
+  labs(y="Tamanho do terreno(em pés quadrados)") +
+  theme_bw() +
+  theme(
+    axis.title.y = element_text(colour = "black", size = 10),
+    axis.title.x = element_blank(),  # Removemos o rótulo do eixo x (string vazia)
+    axis.text = element_text(colour = "black", size = 9.5),
+    panel.border = element_blank(),
+    axis.line = element_line(colour = "black"),
+        plot.title = element_text(size = 12, face = "plain", hjust = 0.5),
+    plot.title.position = "plot") +
+     ggtitle("Figura 9: Gráfico boxplot do tamanho do terreno(em pés quadrados)")
+
+summary(dados$X10)
+sd(summary(dados$X10))
+
+```
+
+```{r}
+resumo <- round(summary(dados$X10),2)
+desvio_padrao <- round(sd(dados$X10),2)
+
+
+tabela_resumo <- data.frame(
+  Estatística = c("Minimo", "Primeiro Quartil.", "Mediana", "Média", "Terceiro Quartil", "Maximo", "Desvio Padrão"),
+  Valor = c(4560,17205,22200,24370, 26787,  86830 , desvio_padrao)
+)
+
+kable(tabela_resumo, caption = "Quadro 3: Medidas Resumo do tamanho do terreno(em pés quadrados)") %>%
+  kable_styling() %>%
+  column_spec(1, bold = TRUE)
+```
+
+Com base a Figura 9 e no Quadro 3 comprova - se que o tamanho médio do terreno das casas 24.370 pés quadrados. Vale a pena lembrar que essa medida pode ser distorcida pela presença de outliers no limite superior do boxplot.Nesse contexto, destaca-se a mediana que é de 22.200 pés quadrados, o que significa que metade dos terrenos tem um tamanho menor ou igual a 22.200, enquanto a outra metade possui um tamanho maior ou igual. Desse modo, a mediana é um medida que pode substituir a média, tendo em vista que é resistente a outliers
+
+Além disso, o menor terreno em que a casa construída possui 4560 pés quadrados, ao mesmo tempo que a casa o maior terreno foi de  86.830 pés quadrados.  Essa grande amplitude entre o valor mínimo e máximo sugere que os terrenos variam consideravelmente em tamanho, abrangendo desde terrenos menores até propriedades bastante espaçosas. Essa amplitude pode ser analisada através do desvio padrão que é de 29.784,69 pés quadrados, trazendo à tona uma  dispersão do tamanho dos terrenos em relação à média
+
+\textbf{Proximidade da rodovia}
+
+A análise descritiva da figura em questão tem como foco a variável $X_{11}$, que corresponde à proximidade das casas em relação à rodovia.
+```{r}
+#x11 Proximidade da “highway"
+
+dados1$X11 = revalue(dados1$X11,c("0"="Não","1"="Sim"))
+
+#Frequencia absoluta e relativa
+freq_table <- table(dados1$X11)
+absolute_freq <- as.vector(freq_table)
+relative_freq <- absolute_freq / sum(absolute_freq) * 100
+
+# data frame das Frequencias 
+freq_df <- data.frame(Categoria = names(freq_table),
+                      absolute_freq,
+                      relative_freq)
+
+# Gráfico de setor
+ggplot(freq_df, aes(x = "", y = absolute_freq, fill = Categoria)) +
+  geom_bar(stat = "identity", width = 1) +
+  geom_text(aes(label = paste0(absolute_freq, " (", sprintf("%.1f", relative_freq), "%)")),
+            position = position_stack(vjust = 0.5), size = 4) +
+  coord_polar("y") +
+  labs(title = "Proximidade da “highway",
+       x = NULL, y = NULL) +
+  scale_fill_manual(values = c("#FF6600", "#0000FF")) +
+  theme_void() +
+   theme(plot.title = element_text(size = 12, face = "plain", hjust = 0.5),
+    plot.title.position = "plot")+
+  ggtitle("Figura 10: Gráfico de setor sobre proximidade das casas com a rodovia")
+```
+
+Analisando a Figura 10, comprova-se que 97,9\% das casas que foram construídas entre 1885 e 1998 não são próximas da rodovia. Apenas 11(2,1\%) casas ficam perto das rodovias.
+
+\textbf{Correlograma das variáveis}
+
+Com o objetivo de análisar a existência ou não das variáveis,dispõe-se o correlograma a seguir:
+```{r}
+# Correlograma de todas as variáveis numericas
+M <- cor(dados[, c("X2", "X3", "X4", "X6","X8","X10")])
+corrplot(M, method = 'number')
+
+
+```
+De acordo com o correlograma,conclui-se que há uma correlação:
+
+- Moderada(Positiva) entre $X_{2}$ e $X_{3}$, $X_{2}$ e $X_{4}$, $X_{2}$ e $X_{6}$, $X_{3}$ e $X_{4}$,$X_{4}$ e $X_{6}$
+- Moderada(Negativa) entre $X_{4}$ e $X_{8}$
+- Forte entre $X_{2}$ e $X_{4}$
+
+\textbf{Correlograma das variáveis escolhidas no modelo}
+
+
+Para as variáveis escolhidadas no modelo, tem-se o correlograma a seguir:
+```{r}
+# Correlograma das variáveis escolhidas no modelo
+
+mod <- cor(dados[, c("X2","X8","X10")])
+corrplot(mod, method = 'number')
+
+```
+

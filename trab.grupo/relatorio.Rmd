@@ -43,16 +43,549 @@ always_allow_html: yes
 {\Large
   Alunos: \\
   Bruno Gondim Toledo | Matrícula: 15/0167636 \\
-  Arthur Rodrigues    | Matrícula: \\
-  Lucas Menezes       | Matrícula:} \\
+  Arthur Rodrigues    | Matrícula: 19/0127376 \\
+  Lucas Menezes       | Matrícula: 18/0105418} \\
 \vskip 1em
 \end{center}
 
 ```{r setup, include=F}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE)
 if (!require("pacman")) install.packages("pacman")
-p_load(tidyverse,readxl,polycor,vegan,caTools,car,quantmod,MASS,corrplot) # pacotes necessários ----
+p_load(tidyverse,readxl,polycor,vegan,caTools,car,quantmod,MASS,corrplot,
+       knitr,cowplot,nlme,Rchoice,AICcmodavg,mdscore,questionr,waterfalls,
+       kableExtra,xtable,plyr,olsrr) # pacotes necessários ----
 dados <- read_excel("trabalho/DADOS_TRABALHO_2023_1.xlsx", # dados ----
                                     sheet = "Dados")
+dados$ID <- factor(dados$ID)
+dados$X1 <- as.numeric(dados$X1)
+dados$X2 <- as.numeric(dados$X2)
+dados$X3 <- as.numeric(dados$X3)
+dados$X4 <- as.numeric(dados$X4)
+dados$X5 <- factor(dados$X5)
+dados$X6 <- as.numeric(dados$X6)
+dados$X7 <- factor(dados$X7)
+dados$X8 <- as.numeric(dados$X8)
+dados$X9 <- factor(dados$X9)
+dados$X10 <- as.numeric(dados$X10)
+dados$X11 <- factor(dados$X11)
+```
+
+\newpage
+
+# Preço de venda da casa
+
+A fim de analisar o comportamento da variável $X_{1}$ (tamanho da casa) dispõe-se o gráfico e o quadro a seguir:
+
+```{r zero}
+#x1  Preço de venda da casa (em dólares)
+
+ggplot(dados) +
+  aes(x = "", y = X1) +  
+  geom_boxplot(fill = "#0000FF", width = 0.5) +
+  stat_summary(
+    fun = "mean", geom = "point", shape = 23, size = 3, fill = "white"
+  ) +
+  labs(x="",y="Preço de venda da casa (em dólares)") +
+  theme_bw() +
+   theme(axis.title.y=element_text(colour="black", size=10),
+        axis.title.x = element_text(colour="black", size=10),
+        axis.text = element_text(colour = "black", size=9.5),
+        panel.border = element_blank(),
+        axis.line = element_line(colour = "black"),
+    plot.title = element_text(size = 12, face = "plain", hjust = 0.5),
+    plot.title.position = "plot") +
+   ggtitle("Figura 1: Gráfico boxplot do preço de venda da casa (em dólares)")
+```
+
+
+```{r zerozero}
+resumo <- round(summary(dados$X1),2)
+desvio_padrao <- round(sd(dados$X1),2)
+
+
+tabela_resumo <- data.frame(
+  Estatística = c("Minimo", "Primeiro Quartil.", "Mediana", "Média", "Terceiro Quartil", "Maximo", "Desvio Padrão"),
+  Valor = c(84000,  180000, 229900, 227894, 335000,92000,round(desvio_padrao))
+)
+
+kable(tabela_resumo, caption = "Quadro 1: Medidas Resumo do preço de venda da casa (em dólares)") %>%
+  kable_styling(latex_options = c("hold_position")) %>%
+  column_spec(1, bold = TRUE)
+```
+
+
+Diante da Figura 1 e do Quadro 1, conclui-se que o menor preço de venda foi de 84 mil dólares, enquanto que a casa mais cara saiu no valor de 920 mil dólares. Além disso, o preço médio das casas foi \$277.894,00 dólares.É importante notar que a média pode ser influenciada pelos valores extremos, ou seja, pelos outliers presentes no limite superior na distribuição dos preços. Dito isso, para analisar o preço médio, pode ser utilizado a mediana, tendo em vista que essa medida é resistente à outliers e separa os dados da distribuição ao meio. Dessa forma, a mediana foi de \$229.900,00 dólares.
+
+Vale ressaltar que 75\% das casas foram vendidas por um preço igual ou inferior a \$335.000,00 dólares, que pode ser visto atráves do terceiro quartil, Já o desvio padrão, apresentou um valor de \$137.923, mostrando que há uma grande variabilidade nos preços das casas, que pode ser notada pela amplitude do boxplot.
+
+
+\newpage
+
+# Tamanho da casa
+
+Para analisar o comportamento da variável $X_{2}$(tamanho da casa) dispõe-se o gráfico e o quadro a seguir:
+
+\vskip 2em
+
+
+```{r um,cache=TRUE}
+#x2 - Tamanho da casa
+
+
+ggplot(dados) +
+  aes(x = "", y = X2) +  
+  geom_boxplot(fill = "#0000FF", width = 0.5) +
+  stat_summary(
+    fun = "mean", geom = "point", shape = 23, size = 3, fill = "white"
+  ) +
+  labs(x="",y="Tamanho da casa(pés quadrados)") +
+  theme_bw() +
+   theme(axis.title.y=element_text(colour="black", size=10),
+        axis.title.x = element_text(colour="black", size=10),
+        axis.text = element_text(colour = "black", size=9.5),
+        panel.border = element_blank(),
+        axis.line = element_line(colour = "black"),
+    plot.title = element_text(size = 12, face = "plain", hjust = 0.5),
+    plot.title.position = "plot") +
+   ggtitle("Figura 1: Gráfico boxplot do tamanho da casas(pés quadrados)")
+
+```
+
+\vskip 2em
+
+
+```{r dois,cache=TRUE}
+resumo <- round(summary(dados$X2),2)
+desvio_padrao <- round(sd(dados$X2),2)
+
+
+tabela_resumo <- data.frame(
+  Estatística = c("Minimo", "Primeiro Quartil.", "Mediana", "Média", "Terceiro Quartil", "Maximo", "Desvio Padrão"),
+  Valor = c(980,  1701, 2061, 2261, 2636, 5032, desvio_padrao)
+)
+
+kable(tabela_resumo, caption = "Quadro 1: Medidas Resumo tamanho das casas (pés quadrados)") %>%
+  kable_styling(latex_options = c("hold_position")) %>%
+  kableExtra::column_spec(1, bold = TRUE)
+
+```
+
+
+Com base na Figura 1 e no Quadro 1, conclui-se que a média de tamanho das casas é de aproximadamente 2261 pés quadrados.Ademais, o valor mínimo é de 980 pés quadrados e o valor máximo é de 5032 pés quadrados, mostrando que a amostra abrange desde casas pequenas até propriedades bastante extensas.
+
+Nesse sentido, destaca-se a amplitude do tamanho das casas, que é a diferença entre o maior e o menor valor observado. Neste caso, a amplitude é de 4052 pés quadrados, mostrando uma grande variação dos no tamanho das casas que pode ser explicada pelo desvio padrão, que é de aproximadamente 711,07 pés quadrados.
+
+Além disso, a mediana, por sua vez, é de 2061 pés quadrados, indicando uma assimetria à direita na distribuição dos dados,visto que a média é maior que a mediana. Essa assimetria pode ser explicada pela presença de valores maiores (outliers) que puxam a média para cima.
+
+\newpage
+
+# Número de quartos
+
+A análise descritiva da variável $X_{3}$ (Número de quartos) é ilustrada na figura abaixo, apresentando um gráfico de colunas. Esse gráfico oferece uma representação visual dos dados relacionados ao número de quartos nas residências estudadas.
+
+```{r tres,cache=TRUE}
+#Número de quartos(X3)
+
+dados1 = dados %>% group_by(X3) %>% tally() %>%
+  mutate(freq1=round((n/sum(n)*100),2))%>%
+  mutate(freq = gsub("\\.", ",",freq1) %>% paste("%",sep = ""),
+         label = str_c(n," (", freq, ")") %>% str_squish())
+
+ ggplot(dados1,aes(x =X3, y = n,label=label)) + 
+  geom_col(stat = "identity", fill = "#0000FF", width = 0.7) + 
+  geom_text(position = position_dodge(width = .9),
+            vjust = -0.5,size = 3)+
+  labs(x = "Número de quartos", y = "Frequência") +
+  scale_x_continuous(breaks = seq(min(dados$X6), max(dados$X6), by = 1)) +
+  theme_bw()+
+   theme(axis.title.y=element_text(colour="black", size=10),
+        axis.title.x = element_text(colour="black", size=10),
+        axis.text = element_text(colour = "black", size=9.5),
+        panel.border = element_blank(),
+        axis.line = element_line(colour = "black"),
+    plot.title = element_text(size = 12, face = "plain", hjust = 0.5),
+    plot.title.position = "plot") +
+  ggtitle("Figura 2: Gráfico de colunas do número de quartos")
+
+```
+
+A partir da Figura 2, observa-se que a maioria das casas construídas entre os anos de 1885 e 1998 possuía entre 3 e 4 quartos, representando quase 73\% do total. Além disso, foi identificado que apenas 1 casa (0,19\%) não possuía nenhum quarto, enquanto em apenas 3 casas (0,57\%) foram encontrados sete quartos
+
+\newpage
+
+# Número de banheiros
+
+Este estudo visa analisar a variável $X_{4}$, que representa o número de banheiros em uma casa. Para facilitar a compreensão dos dados, a figura a seguir apresenta uma visualização gráfica da distribuição dessa variável.
+
+```{r quatro,cache=TRUE}
+#Numero de banheiros (x4)
+dados1 = dados %>% group_by(X4) %>% tally() %>%
+  mutate(freq1=round((n/sum(n)*100),2))%>%
+  mutate(freq = gsub("\\.", ",",freq1) %>% paste("%",sep = ""),
+         label = str_c(n," (", freq, ")") %>% str_squish())
+
+ ggplot(dados1,aes(x =X4, y = n,label=label)) + 
+  geom_col(stat = "identity", fill = "#0000FF", width = 0.7) + 
+  geom_text(position = position_dodge(width = .9),
+            vjust = -0.5,size = 3)+
+  labs(x = "Número de banheiros", y = "Frequência") +
+  scale_x_continuous(breaks = seq(min(dados$X6), max(dados$X6), by = 1)) +
+  theme_bw()+
+   theme(axis.title.y=element_text(colour="black", size=10),
+        axis.title.x = element_text(colour="black", size=10),
+        axis.text = element_text(colour = "black", size=9.5),
+        panel.border = element_blank(),
+        axis.line = element_line(colour = "black"),
+    plot.title = element_text(size = 12, face = "plain", hjust = 0.5),
+    plot.title.position = "plot") +
+  ggtitle("Figura 3: Gráfico de colunas do número de banheiros")
+
+```
+
+Com base na Figura 3, podemos observar que a maioria das casas construídas entre os anos de 1885 e 1998 possui entre 2 e 3 banheiros, representando 66,28% do total. Em contrapartida, 16\% das casas possuem 4 banheiros, enquanto 13,6\% contam com apenas 1 banheiro. É importante destacar que uma parcela inferior a 0,5\% possui entre 6 e 7 banheiros, e somente 1 casa (0,19\%) não possui banheiro.
+
+\newpage
+
+# Presença de ar condicionado
+
+A análise descritiva da variável $X_{5}$, que representa a presença(ou não) de ar condicionado nas casas, é ilustrada através da figura apresentada abaixo, a qual consiste em um gráfico de setor.
+
+```{r cinco,cache=TRUE}
+#Presença de ar condicionado(x5)
+
+dados1 = dados
+dados1$X5 = revalue(dados1$X5,c("0"="Não","1"="Sim"))
+
+#Frequencia absoluta e relativa
+freq_table <- table(dados1$X5)
+absolute_freq <- as.vector(freq_table)
+relative_freq <- absolute_freq / sum(absolute_freq) * 100
+
+# data frame frequencias
+freq_df <- data.frame(Categoria = names(freq_table),
+                      absolute_freq,
+                      relative_freq)
+
+# grafico de setor
+ggplot(freq_df, aes(x = "", y = absolute_freq, fill = Categoria)) +
+  geom_bar(stat = "identity", width = 1) +
+  geom_text(aes(label = paste0(absolute_freq, " (", sprintf("%.1f", relative_freq), "%)")),
+            position = position_stack(vjust = 0.5), size = 4) +
+  coord_polar("y") +
+  scale_fill_manual(values = c("#FF6600", "#0000FF")) +
+  theme_void() +
+  theme(plot.title = element_text(size = 12, face = "plain", hjust = 0.5),
+    plot.title.position = "plot")+
+  ggtitle("Figura 4: Gráfico de setor sobre a presença(ou não) de ar condicionado nas casas")
+```
+
+Diante da figura 4, constata-se que 83\% das casas construídas nos anos de 1885 a 1998 não tinham ar condicionado.
+
+\newpage
+
+# Tamanho da garagem
+
+Nesta análise descritiva, vamos examinar a variável $X_{6}$, que representa o tamanho da garagem, ou seja, o número de carros que podem ser guardados na garagem. A seguir, apresenta-se a figura que ilustra essa variável.
+
+```{r seis,cache=TRUE}
+#x6 Tamanho da garagem
+
+dados1 = dados %>% group_by(X6) %>% tally() %>%
+  mutate(freq1=round((n/sum(n)*100),2))%>%
+  mutate(freq = gsub("\\.", ",",freq1) %>% paste("%",sep = ""),
+         label = str_c(n," (", freq, ")") %>% str_squish())
+
+ ggplot(dados1,aes(x =X6, y = n,label=label)) + 
+  geom_col(stat = "identity", fill = "#0000FF", width = 0.7) + 
+  geom_text(position = position_dodge(width = .9),
+            vjust = -0.5,size = 3)+
+  labs(x = "Tamanho da garagem", y = "Frequência") +
+  scale_x_continuous(breaks = seq(min(dados$X6), max(dados$X6), by = 1)) +
+  theme_bw()+
+   theme(axis.title.y=element_text(colour="black", size=10),
+        axis.title.x = element_text(colour="black", size=10),
+        axis.text = element_text(colour = "black", size=9.5),
+        panel.border = element_blank(),
+        axis.line = element_line(colour = "black"),
+    plot.title = element_text(size = 12, face = "plain", hjust = 0.5),
+    plot.title.position = "plot") +
+  ggtitle("Figura 5: Gráfico de colunas do tamanho da garagem das casas")
+```
+
+De acordo com a Figura 5, conclui-se que  a maioria das casas construídas (cerca de 67,62%) tem espaço para aproximadamente 2 carros em suas garagens. Além disso, cerca de 20% das casas têm capacidade para acomodar 3 carros.Por outro lado, casas com espaço para apenas 1 carro representam menos de 10% do total. Destaca-se também as casas com espaço para 4, 5 ou 7 carros que são ainda mais raras, compreendendo menos de 1% do total cada.
+
+Vale a pena ressaltar que existem mais casas sem garagem (cerca de 1,34% do total) do que casas com capacidade para comportar entre 4 a 7 carros juntas.
+
+\newpage
+
+# Presença de piscina
+
+Com o objetivo de examinar a variável $X_{7}$, que indica se as casas possuem piscina ou não, foi realizada uma análise descritiva, cujos resultados são apresentados na figura abaixo.
+
+```{r sete,cache=TRUE}
+#x7 Piscina
+
+dados1 = dados
+dados1$X7 = revalue(dados1$X7,c("0"="Não","1"="Sim"))
+
+#Frequencia absoluta e relativa
+freq_table <- table(dados1$X7)
+absolute_freq <- as.vector(freq_table)
+relative_freq <- absolute_freq / sum(absolute_freq) * 100
+
+# data frame frequencias
+freq_df <- data.frame(Categoria = names(freq_table),
+                      absolute_freq,
+                      relative_freq)
+
+# grafico de setor
+ggplot(freq_df, aes(x = "", y = absolute_freq, fill = Categoria)) +
+  geom_bar(stat = "identity", width = 1) +
+  geom_text(aes(label = paste0(absolute_freq, " (", sprintf("%.1f", relative_freq), "%)")),
+            position = position_stack(vjust = 0.5), size = 4) +
+  coord_polar("y") +
+  scale_fill_manual(values = c("#FF6600", "#0000FF")) +
+  theme_void() +
+   theme(plot.title = element_text(size = 12, face = "plain", hjust = 0.5),
+    plot.title.position = "plot")+
+  ggtitle("Figura 6: Gráfico de setor sobre a presença(ou não) de ar piscina nas casas")
+
+```
+
+Atráves da Figura 6, constata-se que mais de 90\% das casas construídas entre os anos de 1885 e 1998 possuem piscinas, ao mesmo tempo que apenas 6,9\% não usufruem disso.
+
+\newpage
+
+# Idade das casas
+
+No banco de dados original, a coluna $X_8$ constava o ano de construção da casa. Esta é uma informação potencialmente útil para a análise, porém carecendo de uma transformação para fazer sentido numéricamente. Para tal, transformamos a informação contida na variável para 'Idade da casa', considerando a amplitude abrangida pelo banco de dados. Considerando a casa mais nova presente no banco de dados (Ano 1998) como idade 0, e a casa mais antiga da casa (Ano 1885) como idade 113; e todas as demais seguindo o mesmo padrão.
+
+A fim de examinar a distribuição da variável $X_{8}$, que agora representa a idade das casas em anos, foram elaborados um boxplot e um quadro com medidas resumo.
+
+```{r oito,cache=TRUE}
+#x8 Ano de construção
+
+#transformando variável ano em idade da casa
+
+dados$X8 <- 1998-dados$X8
+
+ggplot(dados) +
+  aes(x = "", y = X8) + 
+  geom_boxplot(fill = "#0000FF", width = 0.5) +
+  stat_summary(
+    fun = "mean", geom = "point", shape = 23, size = 3, fill = "white"
+  ) +
+ labs(x="", y="Idade da casa (anos)") +
+  theme_bw() +
+   theme(axis.title.y=element_text(colour="black", size=10),
+        axis.title.x = element_text(colour="black", size=10),
+        axis.text = element_text(colour = "black", size=9.5),
+        panel.border = element_blank(),
+        axis.line = element_line(colour = "black"),
+    plot.title = element_text(size = 12, face = "plain", hjust = 0.5),
+    plot.title.position = "plot") +
+   ggtitle("Figura 7: Gráfico boxplot da idade das casas(anos)")
+#summary(dados$X8)
+#sd(summary(dados$X8))
+```
+
+
+```{r nove,cache=TRUE}
+resumo <- round(summary(dados$X8),2)
+desvio_padrao <- round(sd(dados$X8),2)
+
+
+tabela_resumo <- data.frame(
+  Estatística = c("Minimo", "Primeiro Quartil.", "Mediana", "Média", "Terceiro Quartil", "Maximo", "Desvio Padrão"),
+  Valor = c(0,17, 32, 31.1, 42, 113, desvio_padrao)
+)
+
+kable(tabela_resumo, caption = "Quadro 2: Medidas Resumo  da idade das casas(anos)") %>%
+  kable_styling(latex_options = c("hold_position")) %>%
+  kableExtra::column_spec(1, bold = TRUE)
+```
+
+Analisando a Figura 7 e no Quadro 2 constata-se que a idade média das casas e de 31,1 anos. Além disso,
+a casa mais nova tem 0 anos, ou seja, foi construída em 1998, enquanto que a casa mais velha tem 113 anos (1885). No entanto, a presença de outliers no limite inferior, pode estar puxando a média para baixo, tornando-a menor que a mediana. Nesse caso, a média não é a melhor medida de tendência central, pois é influenciada por valores extremos. Dessa forma, a mediana é a melhor medida para representar a idade média das casas, já que não é afetada por outliers.
+
+Nesse contexto, a mediana está em torno de 32 anos, ou seja, metade das casas tem uma idade menor ou igual a 32 anos, enquanto a outra metade tem uma idade maior ou igual a esse valor. Vale ressaltar também que o valor do terceiro quartil é de 42 anos, indicando que 75% das casas têm uma idade menor ou igual a 42 anos. 
+
+A amplitude dos da idade das casas é de 113 anos, mostrando uma grande variação da idade que é explicada pelo O desvio padrão de 38.99 anos, indicando uma  dispersão das idades em relação à média.
+
+\newpage
+
+# Qualidade da construção
+
+Com o intuito de analisar a variável $X_{9}$, que representa a qualidade da construção,dispõe-se a figura abaixo:
+
+```{r dez,cache=TRUE}
+#x9 Qualidade da construção 
+
+
+dados1 = dados
+dados1$X9 = revalue(dados1$X9,c("1"="Alta qualidade","2"="Média qualidade","3"="Baixa qualidade"))
+
+#Frequencia absoluta e relativa
+freq_table <- table(dados1$X9)
+absolute_freq <- as.vector(freq_table)
+relative_freq <- absolute_freq / sum(absolute_freq) * 100
+
+# data frame frequencias
+freq_df <- data.frame(Categoria = names(freq_table),
+                      absolute_freq,
+                      relative_freq)
+
+
+ggplot(freq_df, aes(x = fct_reorder(Categoria,absolute_freq, .desc=T), y = absolute_freq)) +
+  geom_col(fill = "#0000FF") +
+  geom_text(aes(label = paste0(absolute_freq, " (", sprintf("%.1f", relative_freq), "%)")),
+            position = position_dodge(width = 0.9), vjust = -0.5, size = 3, color = "black") +
+  labs(x = "Qualidade da construção",
+       y = "Frequência absoluta") +
+  theme_minimal() +
+  theme(axis.title.y=element_text(colour="black", size=10),
+         axis.title.x = element_text(colour="black", size=10),
+         axis.text = element_text(colour = "black", size=9.5),
+         panel.border = element_blank(),
+         axis.line = element_line(colour = "black"),
+         plot.title = element_text(size = 12, face = "plain", hjust = 0.5),
+    plot.title.position = "plot")+
+   ggtitle("Figura 8: Gráfico de colunas da qualidade da construção das casas")
+```
+
+Baseando-se na Figura 8, comprova-se que mais da metade das casas (55,6\%) foram construídas com uma qualidade média. Enquanto isso, 31\% das casas têm uma baixa qualidade e somente 13\% delas são consideradas de alta qualidade.
+
+\newpage
+
+# Tamanho do terreno
+
+Com o propósito de realizar uma análise descritiva da variável $X_{10}$ que representa o tamanho do terreno (pés quadrados), foram apresentadas a figura e o quadro abaixo:
+
+```{r onze,cache=TRUE}
+#x10 Tamanho do terreno
+
+
+ggplot(dados) +
+  aes(x = "", y = X10) +  # Usamos uma string vazia para criar um único boxplot
+  geom_boxplot(fill = "#0000FF", width = 0.5) +
+  stat_summary(
+    fun = "mean", geom = "point", shape = 23, size = 3, fill = "white"
+  ) +
+  labs(y="Tamanho do terreno(em pés quadrados)") +
+  theme_bw() +
+  theme(
+    axis.title.y = element_text(colour = "black", size = 10),
+    axis.title.x = element_blank(),  # Removemos o rótulo do eixo x (string vazia)
+    axis.text = element_text(colour = "black", size = 9.5),
+    panel.border = element_blank(),
+    axis.line = element_line(colour = "black"),
+        plot.title = element_text(size = 12, face = "plain", hjust = 0.5),
+    plot.title.position = "plot") +
+     ggtitle("Figura 9: Gráfico boxplot do tamanho do terreno(em pés quadrados)")
+
+#summary(dados$X10)
+#sd(summary(dados$X10))
+
+```
+
+```{r doze,cache=TRUE}
+resumo <- round(summary(dados$X10),2)
+desvio_padrao <- round(sd(dados$X10),2)
+
+
+tabela_resumo <- data.frame(
+  Estatística = c("Minimo", "Primeiro Quartil.", "Mediana", "Média", "Terceiro Quartil", "Maximo", "Desvio Padrão"),
+  Valor = c(4560,17205,22200,24370, 26787,  86830 , desvio_padrao)
+)
+
+kable(tabela_resumo, caption = "Quadro 3: Medidas Resumo do tamanho do terreno(em pés quadrados)") %>%
+  kable_styling(latex_options = c("hold_position")) %>%
+  kableExtra::column_spec(1, bold = TRUE)
+```
+
+Com base a Figura 9 e no Quadro 3 comprova - se que o tamanho médio do terreno das casas 24.370 pés quadrados. Vale a pena lembrar que essa medida pode ser distorcida pela presença de outliers no limite superior do boxplot.Nesse contexto, destaca-se a mediana que é de 22.200 pés quadrados, o que significa que metade dos terrenos tem um tamanho menor ou igual a 22.200, enquanto a outra metade possui um tamanho maior ou igual. Desse modo, a mediana é um medida que pode substituir a média, tendo em vista que é resistente a outliers
+
+Além disso, o menor terreno em que a casa construída possui 4560 pés quadrados, ao mesmo tempo que a casa o maior terreno foi de  86.830 pés quadrados.  Essa grande amplitude entre o valor mínimo e máximo sugere que os terrenos variam consideravelmente em tamanho, abrangendo desde terrenos menores até propriedades bastante espaçosas. Essa amplitude pode ser analisada através do desvio padrão que é de 29.784,69 pés quadrados, trazendo à tona uma  dispersão do tamanho dos terrenos em relação à média
+
+\newpage
+
+# Proximidade da rodovia
+
+A análise descritiva da figura em questão tem como foco a variável $X_{11}$, que corresponde à proximidade das casas em relação à rodovia.
+
+```{r treze,cache=TRUE}
+#x11 Proximidade da “highway"
+
+dados1$X11 = revalue(dados1$X11,c("0"="Não","1"="Sim"))
+
+#Frequencia absoluta e relativa
+freq_table <- table(dados1$X11)
+absolute_freq <- as.vector(freq_table)
+relative_freq <- absolute_freq / sum(absolute_freq) * 100
+
+# data frame das Frequencias 
+freq_df <- data.frame(Categoria = names(freq_table),
+                      absolute_freq,
+                      relative_freq)
+
+# Gráfico de setor
+ggplot(freq_df, aes(x = "", y = absolute_freq, fill = Categoria)) +
+  geom_bar(stat = "identity", width = 1) +
+  geom_text(aes(label = paste0(absolute_freq, " (", sprintf("%.1f", relative_freq), "%)")),
+            position = position_stack(vjust = 0.5), size = 4) +
+  coord_polar("y") +
+  labs(title = "Proximidade da “highway",
+       x = NULL, y = NULL) +
+  scale_fill_manual(values = c("#FF6600", "#0000FF")) +
+  theme_void() +
+   theme(plot.title = element_text(size = 12, face = "plain", hjust = 0.5),
+    plot.title.position = "plot")+
+  ggtitle("Figura 10: Gráfico de setor sobre proximidade das casas com a rodovia")
+```
+
+Analisando a Figura 10, comprova-se que 97,9\% das casas que foram construídas entre 1885 e 1998 não são próximas da rodovia. Apenas 11(2,1\%) casas ficam perto das rodovias.
+
+\newpage
+
+# Correlograma das variáveis
+
+Com o objetivo de análisar a existência ou não das variáveis,dispõe-se o correlograma a seguir:
+
+```{r quatorze,cache=TRUE}
+# Correlograma de todas as variáveis numericas
+M <- cor(dados[, c("X2", "X3", "X4", "X6","X8","X10")])
+corrplot(M, method = 'number')
+
+
+```
+
+De acordo com o correlograma,conclui-se que há uma correlação:
+
+- Moderada(Positiva) entre $X_{2}$ e $X_{3}$, $X_{2}$ e $X_{4}$, $X_{2}$ e $X_{6}$, $X_{3}$ e $X_{4}$,$X_{4}$ e $X_{6}$
+- Moderada(Negativa) entre $X_{4}$ e $X_{8}$
+- Forte entre $X_{2}$ e $X_{4}$
+
+\newpage
+
+# Correlograma das variáveis escolhidas no modelo
+
+
+Para as variáveis escolhidadas no modelo, tem-se o correlograma a seguir:
+
+```{r quinze,cache=TRUE}
+# Correlograma das variáveis escolhidas no modelo
+
+mod <- cor(dados[, c("X2","X8","X10")])
+corrplot(mod, method = 'number')
+
+```
+
+\newpage
+
+```{r init,cache=TRUE}
+dados <- read_excel("trabalho/DADOS_TRABALHO_2023_1.xlsx", # dados ----
+                    sheet = "Dados")
+
 dados$ID <- factor(dados$ID)
 dados$X1 <- as.numeric(dados$X1)
 dados$X2 <- as.numeric(dados$X2)
@@ -72,19 +605,33 @@ dados$X8 <- dados$X8-1885
 
 #mean(dados$X8)
 
+```
+
+
+# Descrição das transformações das variáveis numéricas do modelo:
+
+## Variáveis X1 X2 e X10 (numéricas do modelo)
+
+Inicialmente a variável resposta continha uma quantidade considerável de outliers, contudo, depois de aplicarmos o logaritmo natural, se comportou de maneira muito mais estável. O mesmo procedimento foi aplicado tanto para a primeira variável explicativa ($X_2$) quanto para a nova variável explicativa $X_10$ e foram obtidos resultados semelhantes. Houveram transformações que não obtiveram outliers algum.
+
+```{r transf,message=F,cache=TRUE}
+
 # transformando x1 em log para tentar normalidade dos residuos
-boxplot(dados$X1)
+par(mfrow = c(1, 2))
+boxplot(dados$X1,main="Variável X1")
 dados$lny <- log(dados$X1)
-boxplot(dados$lny) # com a transformação, a variável apresenta menos outliers. talvez assim fique melhor de trabalhar.
+boxplot(dados$lny,main="Variável ln(X1)") # com a transformação, a variável apresenta menos outliers. talvez assim fique melhor de trabalhar.
 
 # realizando o mesmo procedimento com as variáveis x2 e x10
-boxplot(dados$X2)
+par(mfrow = c(1, 2))
+boxplot(dados$X2,main="Variável X2")
 dados$lnX2 <- log(dados$X2)
-boxplot(dados$lnX2)
+boxplot(dados$lnX2,main="Variável ln(X2)")
 
-boxplot(dados$X10)
+par(mfrow = c(1, 2))
+boxplot(dados$X10,main="Variável X10")
 dados$lnX10 <- log(dados$X10)
-boxplot(dados$lnX10) # essa segue com bastante outliers, apesar da transformação. Mas ao menos a distância da mediana aparenta ser menor.
+boxplot(dados$lnX10,main="Variável ln(X10)") # essa segue com bastante outliers, apesar da transformação. Mas ao menos a distância da mediana aparenta ser menor.
 
 # Salvando os dados brutos num 'cofre'
 cofre <- dados
@@ -97,19 +644,750 @@ dados <- sample_n(cofre,300)
 
 # Separando o conjunto de dados de teste.
 teste <- anti_join(cofre,dados)
+
 ```
 
 \newpage
 
-# Análise exploratória das variáveis
+## Variável X9 (Qualidade de construção da casa)
+
+Esta é uma variável que apresenta três valores: 1, 2 e 3. Porém, na realidade, se trata de uma variável qualitativa ordinal, visto que cada valor se refere a um rótulo de construção da casa, sendo 1 - Alta qualidade; 2 - Média qualidade; 3 - Baixa qualidade. A fim de trabalhar num modelo regressivo linear, esta variável será tratada como do tipo Dummy. A análise foi executada utilizando o software R, que para entender a variável como dummy, basta ser lida como variável do tipo *factor*. Entretanto, se estivéssemos trabalhando no SAS, deveríamos realizar uma transformação, criando duas variáveis 0 - 1 que representariam as três categorias de $X_9$.
+
+## Variável X8 - Idade da casa
+
+Conforme explicitado anteriormente, a informação original da variável era o ano de construção da casa, que para trabalhar modificamos para idade da casa. 
+
+Além disso, foi considerada a possiblidade de uma transformação quadrática nesta variável, visto que havia a suspeita que tanto casas muito novas teriam um valor maior, quanto casas muito antigas talvez pudessem também ter um valor elevado, considerando o valor histórico/relíquia; levando assim a variável a assumir uma forma de parábola. Entretando, analisando exploratóriamente, este comportamento não foi observado, na realidade notou-se uma relação quase linear no sentido de: quanto mais nova a casa; mais cara ela seria. Portanto, esta transformação foi descartada.
+
+\newpage
+
+# Seleção de variáveis
+
+Após a análise descritiva das variáveis gerar uma breve compreensão de como as variáveis podem se comportar, foram testadas as possibilidades de modelos a partir das combinações e avaliações de como as variáveis contribuem na predição da variável resposta. Ao entrar nessa etapa, foi criado um modelo contendo todas as possíveis variáveis do banco de dados com o objetivo de inicialmente compreender quais são as possíveis variáveis que possuem potencial de explicação.
+
+## Modelo completo
+
+```{r fit1,cache=TRUE}
+# Modelo contendo todas as variáveis ---- 
+fit <- lm(lny ~ lnX2+X3+X4+X5+X6+X7+X8+X9+lnX10+X11,data=dados)
+#alias(fit) # Existem variáveis linearmente dependentes, ou seja, devem ser eliminadas para o modelo funcionar.
+#car::vif(fit)
+# Coeficientes do modelo ---- 
+summary(fit)
+```
+
+\newpage
+
+Dado este "primeiro chute" estratégico, foi percebido um valor de $R^2 \ ponderado \ = 0,8463$, o que é muito bom sob o olhar de predição e explicação do modelo. Contudo, duas variáveis, $X_3$ e $X_5$, não se mostraram ter muita influência no resultado de $X_1$ visto que, obtiveram respectivamente os seguintes p-valores, 0,982 e 0,937, que são considerados irrelevantes a quaisquer níveis de significância existentes. 
+
+```{r anovafit1,cache=TRUE}
+# Analisando os coeficientes, notamos um valor r2 muito bom = 0.8463.
+# Além disso, notamos que as variáveis X3 e X5 aparentam realmente não pertencer ao modelo, sob qualquer nível de significância.
+
+# ANOVA do modelo ---- 
+Anova(fit,type = "III")
+ # Pela ANOVA, reforçamos que X3 definitivamente deve ser removida do modelo.
+```
+
+Dessa forma, $X_3$ foi retirado do modelo, e ajustado um outro modelo regressivo sem esta variável.
+
+\newpage
+
+## Modelo sem a variável X3
+
+```{r fit2,cache=TRUE}
+fit2 <- lm(lny ~ lnX2+X4+X5+X6+X7+X8+X9+lnX10+X11,data=dados)
+summary(fit2)
+Anova(fit2,type = "III")
+```
+
+Com a nova versão, notamos que ainda existem variáveis que não se ajustaram ao modelo. Seguindo a parsimônia de eliminá-las uma-a-uma, iremos remover agora a variável $X_7$
+
+\newpage
+
+## Modelo sem as variáveis X3 e X7
+
+```{r fit3,cache=TRUE}
+
+fit3 <- lm(lny ~ lnX2+X4+X5+X6+X8+X9+lnX10+X11,data=dados)
+summary(fit3)
+Anova(fit3,type = "III")
+
+```
+
+Ao analisar o novo modelo, percebemos que ainda existem variáveis não ajustadas. Iremos eliminar agora a variável $X_11$
+
+\newpage
+
+## Modelo sem as variáveis X3, X7 e X11
+
+```{r fit4,cache=TRUE}
+fit4 <- lm(lny ~ lnX2+X4+X5+X6+X8+X9+lnX10,data=dados)
+summary(fit4)
+Anova(fit4,type = "III")
+```
+
+Aqui, notamos o mesmo padrão: O $R^2$ ajustado segue bom, porém, ainda há variáveis que não se encaixam no modelo. Iremos remover agora a variável $X_5$
+
+\newpage
+
+## Modelo sem as variáveis X3, X5, X7 e X11
+
+```{r fit5,cache=TRUE}
+fit5 <- lm(lny ~ lnX2+X4+X6+X8+X9+lnX10,data=dados)
+summary(fit5)
+Anova(fit5,type = "III")
+```
+
+Aqui, notamos que o $R^2$ ajustado segue praticamente intacto, porém com um modelo bem mais reduzido e parsimonioso. Ainda há variáveis que sob $\alpha=0,05$ não se ajustam, porém seus p-valores começam a não diferir muito do aceitável.
+
+Iremos agora testar outra abordagem, que é a de utilizar métodos automáticos para nos ajudar a selecionar as variáveis ideais do modelo à partir daqui.
+
+\newpage
+
+# Métodos de seleção automática
+
+## Método Backward
+
+Ao contrário do método forward, o método backward começa com o modelo completo e, em cada etapa, remove uma variável por vez com base nos critérios de seleção.
+
+```{r back1,cache=TRUE}
+
+# Avaliação do modelo por métodos automáticos ----
+stepwise <- step(fit5,direction = 'both') # stepwise
+backward <- step(fit5,direction = 'backward') # backward
+forward <- step(fit5,direction = 'forward') # forward
+
+summary(backward)
+```
+
+\newpage
+
+## Método Forward
+
+Este método começa com um modelo vazio e adiciona uma variável por vez ao modelo, escolhendo a variável que melhora o ajuste do modelo de acordo com os critérios de seleção.
+
+```{r for1,cache=TRUE}
+summary(forward)
+```
+
+\newpage
+
+## Método Stepwise
+
+Este método realiza um processo iterativo de inclusão e exclusão de variáveis do modelo com base em critérios de seleção, como o valor-p, AIC (Akaike Information Criterion) ou BIC (Bayesian Information Criterion). Ele começa com um modelo inicial e, em cada etapa, adiciona ou remove a variável que resulta no melhor ajuste do modelo com base nos critérios escolhidos.
+
+```{r step1,cache=TRUE}
+summary(stepwise)
+```
+
+\newpage
+
+O novo modelo, que contem todas as variáveis menos X3, X5, X7 e X11 foi realizada uma avaliação por métodos automáticos, visto que ao realizar a ANOVA do modelo novo vemos que todas as variáveis possuem significância ao nível de aproximadamente 20%.
+
+- A análise por backward foi resultou no modelo contendo lnX2, X4, X6, X8, X9 e lnX10
+
+- A análise por forward foi resultou no modelo contendo lnX2, X4, X6, X8, X9 e lnX10
+
+- A análise por stepwise foi resultou no modelo contendo lnX2, X4, X8, X9 e lnX10. 
+
+Notamos que para os três métodos de seleção, os resultados de $R^2$ ponderado estão muito próximos, contudo a análise stepwise (mais precisa) foi a única que destoou das demais, removendo uma das variáveis ($X_6$). Portanto, iremos removê-la do modelo também.
+
+## Modelo sem as variáveis X3, X5, X6, X7 e X11
+
+```{r fit6,cache=TRUE}
+fit6 <- lm(lny ~ lnX2+X4+X8+X9+lnX10,data=dados)
+summary(fit6)
+Anova(fit6,type = "III")
+```
+
+Com a nova versão do modelo, sem a variável X6, foi realizada a análise do modelo de regressão e sua respectiva ANOVA. Observa-se que na ANOVA todos os p-valores se mostram significantes, com exceção da variáveL X4. A qualidade de ajuste do modelo segue muito satisfatória, visto que o valor de $R^2$ ponderado observado foi de 0,8472.
+
+\newpage
+
+## Modelo sem as variáveis X3, X4, X5, X6, X7 e X11
+
+A tabela de regressão linear gerada a partir do modelo anterior, sem o $X_6$, foi notado que a variável $X_4$ parece se destoar muito ao comparar o p-valor dela com as demais. Assim, foi testado retirá-la do modelo para avaliar as possíveis interferências na explicação.
+
+```{r fit7,cache=TRUE}
+fit7 <- lm(lny ~ lnX2+X8+X9+lnX10,data=dados)
+summary(fit7)
+Anova(fit7,type = "III")
+```
+
+Ao realizar o teste, percebe-se um valor de $R^2$ ponderado muito bom, sendo 0,8466, e a partir dessa medida a variável $X_4$ foi desconsiderada. Com o objetivo de gerar uma maior garantia foi testado uma  possível redução do modelo pelo método de avaliação automático stepwise e notou-se um bom comportamente das variáveis do modelo. Por fim, foram validadas as variáveis explitivas para o MRLM.
+
+```{r step2,cache=TRUE}
+stepwise <- step(fit7,direction = 'both') # stepwise
+summary(stepwise)
+```
+
+O método stepwise manteve as variáveis exatamente iguais. Portanto, acredito que é seguro afirmar que este é o modelo geral ótimo.
+
+\newpage
+
+# Análise dos resíduos do modelo selecionado
+
+```{r resfit7,cache=TRUE}
+
+# com o ggplot2 ----
+dados$rstudent <- rstudent(fit7)
+
+ggplot(dados, aes(x = 1:length(rstudent), y = rstudent)) +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "red") +
+  geom_hline(yintercept = 2, linetype = "dashed", color = "blue") +
+  geom_hline(yintercept = -2, linetype = "dashed", color = "blue") +
+  geom_point() +
+  #  geom_text(aes(label = round(rstudent, 2)), vjust = -1.5) +
+  labs(x = "Observações", y = "rstudent") +
+  ggtitle("Gráfico de rstudent") +
+  theme_minimal()
+
+dados$rstandard <- rstandard(fit7)
+
+ggplot(dados, aes(x = 1:length(rstandard), y = rstandard)) +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "red") +
+  geom_hline(yintercept = 2, linetype = "dashed", color = "blue") +
+  geom_hline(yintercept = -2, linetype = "dashed", color = "blue") +
+  geom_point() +
+  #  geom_text(aes(label = round(rstandard, 2)), vjust = -1.5) +
+  labs(x = "Observações", y = "rstandard") +
+  ggtitle("Gráfico de rstandard") +
+  theme_minimal()
+
+# INTERPRETAÇÃO: Aqueles valores maiores que |2| são possíveis outliers.
+
+# Análise de valores influentes ----
+
+dados$dffits <- dffits(fit7)
+
+p <- 6 # número de parâmetros do modelo | um pouco de dúvida aqui se realmente são 4...
+n <- nrow(dados) # tamanho da amostra
+
+ggplot(dados, aes(x = 1:length(dffits), y = dffits)) +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "red") +
+  geom_hline(yintercept = 2*(p/n)^(1/2), linetype = "dashed", color = "blue") +
+  geom_hline(yintercept = -(2*(p/n)^(1/2)), linetype = "dashed", color = "blue") +
+  geom_point() +
+  #  geom_text(aes(label = round(dffits, 2)), vjust = -1.5) +
+  labs(x = "Observações", y = "dffits") +
+  ggtitle("Gráfico de dffits") +
+  theme_minimal()
+
+# INTERPRETAÇÃO: Aqueles valores maiores que |2*(p/n)^(1/2)| 
+# são possíveis valores influentes.
+
+# Alguns gráficos do modelo ----
+plot(fit7) # tem que dar <enter> no Console pra ir mostrando os gráficos
+
+shapiro.test(fit7$residuals) # normalidade 'ok' a 5%
+
+```
+
+Estes gráficos nos ajudam a observar quais valores são possíveis outliers, assim como identificar possíveis valores mais influentes. Além disso, é necessário checar o pressuposto de normalidade dos resíduos do modelo, hipótese esta não rejeitada à $\alpha=0,05$ (porém bem próximo; seria rejeitada a normalidade à $\alpha=0,10$).
+
+\newpage
+
+# Análise de curvatura e suas interações
+
+As etapas realizadas anteriormente nos permitiram selecionar um bom modelo regressivo utilizando muito menos variáveis do que o total coletado, o que facilita e barateia futuras coletas de dados, focando esforço e verba no que realmente interessa. Porém, dado que estamos em posse dessas variáveis, é interessante checar transformações e interações extras sob essas variáveis. Estas não consomem nada a mais de verba e esforço senão do computador (e dos estatísticos encarregados pela análise), portanto, devem ser executadas a fim de tornar o modelo o melhor e mais preciso possível. Uma das coisas importantes que devemos tentar corrigir é a normalidade dos resíduos, visto que pelo teste de Shapiro-Wilk, o p-valor se aproximou bastante da rejeição de $H_0$.
+
+```{r fit7_2,cache=TRUE}
+fit7_2 <- lm(lny ~ lnX2*X8*X9*lnX10,data=dados)
+summary(fit7_2)
+Anova(fit7_2,type = "III")
+```
+
+Testando a interação, notamos significância em todos os casos. Para isso, utilizaremos o método automático Stepwise para tentar selecionar as melhores.
+
+```{r step3_2,cache=TRUE}
+stepwise2 <- step(fit7_2,direction = 'both',steps=10000000) 
+summary(stepwise2)
+Anova(stepwise2,type = "III")
+```
+
+# O modelo final selecionado
+
+Observando os resultados do método Stepwise, notamos que ainda podemos fazer mais alguns ajustes manuais, a fim de chegar ao modelo ideal
+
+```{r fit_f,cache=TRUE}
+fit_f <- lm(lny~ lnX2+X8+X9+lnX10+lnX2:X9+lnX2:lnX10+lnX2:X8:X9:lnX10,data = dados)
+summary(fit_f)
+Anova(fit_f,type = "III")
+
+```
+
+
+Foi testada todas as interações das variáveis selecionadas, lnX2, X8, X9 e lnX10. Algumas intereções se mostraram importantes, como lnX2:X9, lnX2:lnX10  e  lnX2:X8:X9:lnX10; e foram deixadas no modelo. Por consequência, o modelo final selecionado é o que contém as variáveis explicativas lnX2, X8,X9 e lnX10; e as interações entre elas lnX2:X9, lnX2:lnX10, lnX2:X8:X9:lnX10.
+
+Com o novo modelo em mãos, foi realizada a análise de regressão linear e sua respectiva ANOVA, resultando em uma aceitação boa de todas as componentes do modelo assim como um acrescimo no valor de $R^2$ ao acrescentar as interações significantes das variávesis, resultando no novo valor de $R^2$ ponderado sendo 0,8673.
+
+```{r resfit_f,cache=TRUE}
+shapiro.test(fit_f$residuals) 
+qqnorm(fit_f$residuals)
+qqline(fit_f$residuals)
+```
+
+Ao realizar a análise de resíduos do novo modelo, vemos que existe uma aderência a normalidade com p-valor de 0.3282,
+satisfazendo assim a hipótese de normalidade dos resíduos.
+
+\newpage
+
+# Testes para possível melhora
+
+```{r fit_f2,cache=TRUE}
+fit_f2 <- lm(lny~ lnX2+X8+X9+lnX10+lnX2:X9+lnX2:lnX10,data = dados)
+summary(fit_f2) # r^2 = 0.8648. Muito bom!!
+Anova(fit_f2,type = "III")
+
+shapiro.test(fit_f2$residuals) # Normalidade bem ok
+qqnorm(fit_f2$residuals)
+qqline(fit_f2$residuals)
+```
+
+Ainda que na ANOVA tenhamos valores que corroborem para melhor desempenho do modelo acima, os residuos sofrem um leve desgaste, dessa forma, compreendemos que o modelo ajustado anteriormente é o melhor.
+
+# Análise gráfica
+
+## Resíduos, outliers e valores influentes
+
+Na análise de resíduos do modelo, foi contabilizado pela studentização e pela normalização com o objetivo de identificar valores outliers e foram notadas algumas possíveis observações como outliers. Dado o gatilho, foi  feita em seguida a análise de valores influentes, que possibilita a identificação das observações que se distanciam da abordagem que o modelo propõe.
+
+```{r resfit_f2,cache=TRUE}
+dados$rstudent <- rstudent(fit_f)
+
+ggplot(dados, aes(x = 1:length(rstudent), y = rstudent)) +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "red") +
+  geom_hline(yintercept = 2, linetype = "dashed", color = "blue") +
+  geom_hline(yintercept = -2, linetype = "dashed", color = "blue") +
+  geom_point() +
+  #  geom_text(aes(label = round(rstudent, 2)), vjust = -1.5) +
+  labs(x = "Observações", y = "rstudent") +
+  ggtitle("Gráfico de rstudent") +
+  theme_minimal()
+
+dados$rstandard <- rstandard(fit_f)
+
+ggplot(dados, aes(x = 1:length(rstandard), y = rstandard)) +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "red") +
+  geom_hline(yintercept = 2, linetype = "dashed", color = "blue") +
+  geom_hline(yintercept = -2, linetype = "dashed", color = "blue") +
+  geom_point() +
+  #  geom_text(aes(label = round(rstandard, 2)), vjust = -1.5) +
+  labs(x = "Observações", y = "rstandard") +
+  ggtitle("Gráfico de rstandard") +
+  theme_minimal()
+
+# INTERPRETAÇÃO: Aqueles valores maiores que |2| são possíveis outliers.
+
+# Análise de valores influentes ----
+
+dados$dffits <- dffits(fit_f)
+
+p <- 12 # número de parâmetros do modelo (fiquei meio em dúvida aqui, se são 4; 5; 8 ou 9...)
+n <- nrow(dados) # tamanho da amostra
+
+# Criação da função que contabiliza:
+obs = rep("",nrow(dados))
+verificar_maior_modulo <- function(valor) {
+  if (abs(valor) > 2*(p/n)^(1/2)) {
+    return(i)
+  } else {
+    return("")
+  }
+}
+# Criação da sequencia de variaveis acima do valor indicado
+sequencia = c(rep("",nrow(dados)))
+for ( i in 1:nrow(dados)){
+  sequencia[i] = verificar_maior_modulo(dados$dffits[i])  
+  
+}
+
+
+ggplot(dados, aes(x = 1:length(dffits), y = dffits)) +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "red") +
+  geom_hline(yintercept = 2*(p/n)^(1/2), linetype = "dashed", color = "blue") +
+  geom_hline(yintercept = -(2*(p/n)^(1/2)), linetype = "dashed", color = "blue") +
+  geom_point() +
+  geom_text(aes(label = sequencia), vjust = 1, hjust = 1) +
+  labs(x = "Observações", y = "dffits") +
+  ggtitle("Gráfico de dffits") +
+  theme_minimal()
+
+# INTERPRETAÇÃO: 
+# Aqueles valores maiores que |2*(p/n)^(1/2)| são possíveis valores influentes.
+
+# Alguns gráficos do modelo_____________________________________________________
+plot(fit_f) # tem que dar <enter> no console para os gráficos rodarem
+
+vif(fit_f)
+
+```
+
+```{r grid,cache=TRUE}
+
+dados$Residuo = fit_f$residuals
+dados$Preditos <- predict(fit_f)
+
+
+dados$Leverage <- influence.measures(fit_f)[[1]][,6]
+dados$CooksD <- influence.measures(fit_f)[[1]][,5]
 
 
 
-# Análise de regressão linear
+g1 <- ggplot(dados,aes(Preditos,Residuo)) + 
+  geom_point(na.rm = T) + geom_hline(yintercept=0)+ 
+  theme_classic()+labs(x = "Valores Ajustados", y="Residuos") 
 
 
+verificar_maior_modulo.rs <- function(valor) {
+  if (abs(valor) > 2) {
+    return(i)
+  } else {
+    return("")
+  }
+}
+# Criação da sequencia de variaveis acima do valor indicado
+sequenciars = c(rep("",nrow(dados)))
+for ( i in 1:nrow(dados)){
+  sequenciars[i] = verificar_maior_modulo.rs(dados$rstudent[i])  
+  
+}
+
+g2 <- ggplot(dados,aes(Preditos,rstudent)) + geom_point(na.rm = T) +
+  geom_hline(yintercept=c(-2,2))+ theme_classic()+
+  labs(x = "Valores Ajustados", y="RStudent") + 
+  scale_y_continuous(limits=c(-3.5,4)) +
+  geom_text(aes(label = sequenciars), vjust = 1, hjust = 1)
+
+
+g3 <- ggplot(dados,aes(Leverage,rstudent)) + geom_point(na.rm = T) +
+  geom_hline(yintercept=c(-2,2))+ theme_classic()+
+  labs(x = "Leverage", y="RStudent") + 
+  scale_y_continuous(limits=c(-4,4)) +
+  geom_text(aes(label = sequenciars), vjust = 0, hjust = 1)
+
+g4 <- ggplot(dados,aes(Preditos,X1)) + geom_point(na.rm = T) + 
+  theme_classic()+labs(x = "Valores Ajustados", y="Resposta") + 
+  scale_x_continuous(limits = c(.1,0.5)) + 
+  scale_y_continuous(limits = c(.1,.5)) + 
+  geom_abline(slope = 1, intercept = 0)
+
+
+verificar_maior_modulo.cD <- function(valor) {
+  if (abs(valor) > .15) {
+    return(i)
+  } else {
+    return("")
+  }
+}
+# Criação da sequencia de variaveis acima do valor indicado
+sequenciacD = c(rep("",nrow(dados)))
+for ( i in 1:nrow(dados)){
+  sequenciacD[i] = verificar_maior_modulo.cD(dados$CooksD[i])  
+  
+}
+
+
+g5 <- ggplot(dados,aes((1:nrow(dados)),CooksD)) + geom_point(na.rm = T) +
+  geom_line(na.rm = T)+ theme_classic()+ 
+  labs(x = "Observacao", y="Distancia de Cook") + 
+  scale_x_discrete(limits = c(1,2,3,4,5,6,7)) + 
+  scale_y_continuous(limits=c(-.4,.4)) +
+  geom_text(aes(label = sequenciacD), vjust = 1, hjust = 1)
+
+
+ggQQ = function(lm) {
+  d <- data.frame(std.resid = residuals(lm))
+  # calculate 1Q/4Q line
+  y <- quantile(d$std.resid[!is.na(d$std.resid)], c(0.25, 0.75))
+  x <- qnorm(c(0.25, 0.75))
+  slope <- diff(y)/diff(x)
+  int <- y[1L] - slope * x[1L]
+  
+  p <- ggplot(data=d, aes(sample=std.resid)) +
+    stat_qq(shape=1, size=2) +        # open circles
+    labs(x="Quantis",                 # x-axis label
+         y="Residuo") +               # y-axis label
+    geom_abline(slope = slope, intercept = int, linetype="dashed")+
+    theme_classic() 
+  return(p)
+}
+
+g6 <-ggQQ(fit_f)  
+plot_grid(g1,g2,g3,g4,g5,g6, ncol=3)# compilado de graficos da análise
+
+```
+
+## Intervalo de confiança 95% para os parâmetros do modelo
+
+```{r ic,cache=TRUE}
+confint(fit_f,cache=TRUE) # intervalo de confiança 95% pros parâmetros do modelo
+```
+
+\newpage
+
+# Testando retornar as variáveis originais
+
+```{r fitinitt,cache=TRUE}
+
+# Testando retornar as variáveis originais______________________________________
+
+fit <- lm(X1~X2+X8+X9+X10+X2:X9+X2:X10+X2:X8:X9:X1,data=dados)
+summary(fit) # r2 bom, x2 e x10 perdem a significância.
+Anova(fit,type = "III")
+
+# porém x2:x10 perde a significância à 5% 
+# (talvez seja melhor remover essa interação?)
+
+#confint(fit)
+# temos 11 variaveis como sendo as descritas para o modelo 
+# (incluindo interações)
+vif(fit)
+
+shapiro.test(fit$residuals) # Normalidade bem ok
+qqnorm(fit$residuals)
+qqline(fit$residuals)
+
+```
+
+
+Foi testada a possibilidade de retorno das variáveis do modelo ao seu formato original, uma vez que X2 e X10 foram  manipuladas na escala de logaritmo natural. O modelo original possui um ótimo valor de R2 ajustado de 0.9666. Contudo X10 perde sua significância, assim como a interação entre X2 e X10 também.
+
+Porém, a hipótese de normalidade dos resíduos é contundentemente descartada, portanto, é melhor seguir com o modelo com as variáveis numéricas transformadas em logarítmo natural, apenas fazendo a desconversão para apresentar os resultados ao cliente.
+
+\newpage
+
+# Multicolinearidade
+
+```{r multic,cache=TRUE}
+# Checando Problemas de Multicolinearidade======================================
+
+# variáveis transformadas_______________________________________________________
+t1 <- data.frame(dados$lnX2,dados$X8,dados$lnX10)
+# Como X9 não é numérica, não é possível testar correlação.
+kable(cor(t1))
+# ln X2 tem correlação moderada com X8; e ln X2 tem correlação fraca 
+# com ln X10. Correlação de X8 com ln X10 é quase nula.
+
+# Verificando nas variáveis originais___________________________________________
+t2 <- data.frame(dados$X2,dados$X8,dados$X10) 
+# Como X9 não é numérica, não é possível testar correlação.
+kable(cor(t2))
+# Um padrão muito parecido aqui, apenas a correlação de X8 com
+# ln X10 aumenta um pouco, mas continua fraca.
+
+# Aparentemente, não teremos problemas de multicolinearidade com este modelo.
+
+```
+
+Foram geradas as matrizes de correlação entre as variáveis numericas do modelo transformado e o das variáveis  originais onde não foi notada grandes evidências de multicolinearidade entre as variáveis. A única diferença seria quanto a correlação entre X8 e lnX10, onde no modelo de variáveis originais ela é um pouco maior, saindo de -0.07 para -0.12, ou seja, ainda que exista diferença não é algo significante. A mesma situação acontece com lnX2 e X8.
+
+# Testando o ajuste do modelo no conjunto de teste
+
+```{r test_set,cache=TRUE}
+teste$lnypred <- predict(fit_f, newdata = teste)
+teste$X1_pred <- exp(teste$lnypred)
+
+ln_m0_MSE  <- mean(teste$lnypred - teste$lny)^2
+m0_MSE  <- mean(teste$X1_pred - teste$X1)^2
+
+# Em ln, o modelo está com um MSE baixíssimo dos valores preditos pros valores reais.
+# desfazendo a transformação, sobe para um valor aparentemente alto, mas que deve ser analisado com calma, pela escala da variável.
+
+```
+
+Em ln, o modelo transformado está com um MSE baixíssimo (`r ln_m0_MSE`) dos valores preditos pros valores reais. Ao desfazer a transformação e retornar ao modelo original, o MSE sobe para um valor aparentemente alto (`r m0_MSE`), mas que deve ser analisado com calma, pela escala da variável. 
+
+Concluímos portanto que o modelo treinado com o conjunto de treino de 300 observações prediz bem quando aplicado no conjunto de testes de 222 observações.
+
+
+# Validação do modelo pelos coeficiente de Mallow.
+
+Foi desenvolvido, para princípio de comparação pelo coeficiente de Mallow 4 modelos comparativos, onde o primeiro é o modelo final gerado com as transformações, o segundo modelo seria o modelo final sem as transformações e, em seguida, os mesmos dois modelos com e sem a transformação, sem as interações das variáveis.
+
+```{r M_crit,cache=TRUE}
+model <- fit_f
+model2 <- lm(lny ~ lnX2+X8+X9+lnX10,data=dados)
+model3 <- lm(lny ~ lnX2+X4+X5+X6+X8+X9+lnX10,data=dados)
+model4 <- lm(lny ~ lnX2+X4+X8+X9+lnX10,data=dados)
+fullmodel <- lm(lny ~ lnX2*X3*X4*X5*X6*X7*X8*X9*lnX10*X11,data=dados)
+
+um <- ols_mallows_cp(model, fullmodel)# converge quase certamenta para o numero de parâmetros 14 para 12(= p)
+dois <- ols_mallows_cp(model2, fullmodel)
+tres <- ols_mallows_cp(model3, fullmodel)
+quatro <- ols_mallows_cp(model4, fullmodel)
+
+
+model5 <- lm(lny ~ lnX2*X3*X4*X5*X6*X7*X8*X9*lnX10*X11,data=dados)
+cinco <- ols_mallows_cp(model5, fullmodel)
+
+# MELHOR MODELO POSSÍVEL é O MODELO F.
+#ols_mallows_cp(model, fullmodel)# Melhor critério até o momento.
+```
+
+## Coeficiente de Mallow pro modelo sem interações:
+
+`r dois`
+
+## Coeficiente de Mallow pro modelo com as variáveis lnX2, X4, X5, X6, X8, X9 e lnX10:
+
+`r tres`
+
+## Coeficiente de Mallow pro modelo com as variáveis lnX2, X4, X8, X9 e lnX10:
+
+`r quatro`
+
+## Coeficiente de Mallow pro modelo com todas as variáveis e todas as interações possíveis entre elas:
+
+`r cinco`
+
+## Coeficiente de Mallow pro modelo selecionado:
+
+`r um`
+
+
+Com isso, concluímos que, dos possíveis modelos analisados, o modelo escolhido é o que apresenta o melhor coeficiente de Mallows, com o valor observado (`r um`) se aproximando do valor ótimo de igualdade à $p=12+1=13$.
+
+\newpage
+
+# Análise de acrescimo de informação
+
+```{r run,include=FALSE,cache=TRUE}
+fit_f <- lm(lny~ lnX2+X8+X9+lnX10+lnX2:X9+lnX2:lnX10+lnX2:X8:X9:lnX10,data = dados)
+summary(fit_f)
+anova_f <- aov(fit_f)
+summary(anova_f)
+
+shapiro.test(fit_f$residuals) 
+qqnorm(fit_f$residuals)
+qqline(fit_f$residuals)
+
+# Modelo principal com:
+summary(model) # R2 = 0.8673 de R2 ponderado
+
+# SOMA DE QUADRADOS TOTAL
+SQTO = sum((dados$lny - mean(dados$lny))^2)
+
+# Modelo mais simples: lnX2_____________________________________________________
+
+summary(lm(data=dados, lny ~ lnX2))# R2 = 0.7231
+Simp1 = (summary(aov(lm(data=dados, lny ~ lnX2))))[[1]]$`Sum Sq`[c(1:2)]
+Simp1 = round(Simp1[1]/SQTO,5)*100
+
+shapiro.test((lm(data=dados, lny ~ lnX2))$residuals)
+
+p.v_simp1 = (shapiro.test((lm(data=dados, lny ~ lnX2))$residuals))$p.value
+
+
+# Modelo mais simples: lnX2 + X8________________________________________________
+
+summary(lm(data=dados, lny ~ lnX2 + X8))# R2 = 0.7787
+Simp2 = (summary(aov(lm(data=dados, lny ~ lnX2 + X8))))[[1]]$`Sum Sq`[c(1:3)]
+Simp2 = round(Simp2[2]/SQTO,5)*100
+
+shapiro.test((lm(data=dados, lny ~ lnX2 + X8))$residuals)
+
+p.v_simp2 = (shapiro.test((lm(data=dados, lny ~ lnX2 + X8))$residuals))$p.value
+
+
+# Modelo mais simples: lnX2 + X8 + X9___________________________________________
+
+
+summary(lm(data=dados, lny ~ lnX2 + X8 + X9))# R2 = 0.8298
+Simp3 = (summary(aov(lm(data=dados, lny ~ lnX2 + X8 + X9))))[[1]]$`Sum Sq`[c(1:4)]
+Simp3 = round(Simp3[3]/SQTO,5)*100
+
+shapiro.test((lm(data=dados, lny ~ lnX2 + X8 + X9))$residuals)
+
+p.v_simp3 = (shapiro.test((lm(data=dados, lny ~ lnX2 + X8 + X9))$residuals))$p.value
+
+# Modelo mais simples: lnX2 + X8 + X9 + lnX10___________________________________
+summary(lm(data=dados, lny ~ lnX2 + X8 + X9 +lnX10))# R2 = 0.8466
+Simp4 = (summary(aov(lm(data=dados, lny ~ lnX2 + X8 + X9 +lnX10))))[[1]]$`Sum Sq`[c(1:5)]
+Simp4 = round(Simp4[4]/SQTO,5)*100
+
+shapiro.test((lm(data=dados, lny ~ lnX2 + X8 + X9 + lnX10 ))$residuals)
+
+p.v_simp4 = (shapiro.test((lm(data=dados, lny ~ lnX2 + X8 + X9 + lnX10 ))$residuals))$p.value
+
+
+# Modelo com interações: lnX2 + X8 + X9 + lnX10 + lnX2:X9_______________________
+summary(lm(data=dados, lny ~ lnX2 + X8 + X9 + lnX10 + lnX2:X9))# R2 = 0.8622 
+comp1 = (summary(aov(lm(data=dados, lny ~ lnX2 + X8 + X9 + lnX10 + lnX2:X9))))[[1]]$`Sum Sq`[c(1:6)]
+comp1 = round(comp1[5]/SQTO,5)*100
+
+shapiro.test((lm(data=dados, lny ~ lnX2 + X8 + X9 + lnX10 + lnX2:X9))$residuals)
+p.v_comp1 = (shapiro.test((lm(data=dados, lny ~ lnX2 + X8 + X9 + lnX10 + lnX2:X9))$residuals))$p.value
+
+
+# Modelo com interações:  lnX2 + X8 + X9 + lnX10 + lnX2:X9 + lnX2:lnX10_________
+summary(lm(data=dados, lny ~ lnX2 + X8 + X9 + lnX10 + lnX2:X9 + lnX2:lnX10))# R2 = 0.8648 
+comp2 = (summary(aov(lm(data=dados, lny ~ lnX2 + X8 + X9 + lnX10 + lnX2:X9 + lnX2:lnX10))))[[1]]$`Sum Sq`[c(1:7)]
+comp2 = round(comp2[6]/SQTO,5)*100
+
+shapiro.test((lm(data=dados, lny ~ lnX2 + X8 + X9 + lnX10 + lnX2:X9 + lnX2:lnX10))$residuals)
+
+p.v_comp2 = (shapiro.test((lm(data=dados, lny ~ lnX2 + X8 + X9 + lnX10 + lnX2:X9 + lnX2:lnX10))$residuals))$p.value
+
+
+# Modelo com interações: lnX2 + X8 + X9 + lnX10 + lnX2:X9 + lnX2:lnX10 + lnX2:X8:X9:lnX10
+summary(lm(data=dados, lny ~ lnX2 + X8 + X9 + lnX10 + lnX2:X9 + lnX2:lnX10 + lnX2:X8:X9:lnX10 ))# R2 = 0.8673 
+comp3 = (summary(aov(lm(data=dados, lny ~ lnX2 + X8 + X9 + lnX10 + lnX2:X9 + lnX2:lnX10 + lnX2:X8:X9:lnX10 ))))[[1]]$`Sum Sq`[c(1:8)]
+comp3 = round(comp3[7]/SQTO,5)*100
+
+shapiro.test((lm(data=dados, lny ~ lnX2 + X8 + X9 + lnX10 + lnX2:X9 + lnX2:lnX10 + lnX2:X8:X9:lnX10))$residuals)
+
+
+p.v_comp3 = (shapiro.test((lm(data=dados, lny ~ lnX2 + X8 + X9 + lnX10 + lnX2:X9 + lnX2:lnX10 + lnX2:X8:X9:lnX10))$residuals))$p.value
+
+```
+
+A partir do gatilho que as interações mostraram ter na análise de validação pelo coeficiente de Mallows, foi análisado o acrescimo de explicação que cada uma das variáveis do modelo podem ter, sendo representada pelo gráfico de cascata abaixo:
+
+```{r cascata,cache=TRUE}
+
+cascata = data.frame(
+  
+  Variaveis = as.factor(c("lnX2","X8","X9","lnX10","lnX2:X9","lnX2:lnX10","lnX2:X8:X9:lnX10")),
+  Valores = c(Simp1,Simp2,Simp3,Simp4,comp1,comp2,comp3)
+  
+)
+
+cascata$Variaveis <- factor(cascata$Variaveis, levels = c("lnX2","X8","X9","lnX10","lnX2:X9","lnX2:lnX10","lnX2:X8:X9:lnX10"))
+
+
+# "Porcetagem de explicação por variável"
+waterfall(values = cascata$Valores,
+          labels = cascata$Variaveis)
+
+
+# Convergência do p-valor para a normalidade conforme as variáveis são acrescentadas:
+
+
+pvalores = data.frame(
+  
+  Variaveis = as.factor(c("lnX2","X8","X9","lnX10","lnX2:X9","lnX2:lnX10","lnX2:X8:X9:lnX10")),
+  P.Valores = as.numeric(c(p.v_simp1,p.v_simp2,p.v_simp3,p.v_simp4,p.v_comp1,p.v_comp2,p.v_comp3))
+  
+)
+
+pvalores$Variaveis <- factor(pvalores$Variaveis, levels = c("lnX2","X8","X9","lnX10","lnX2:X9","lnX2:lnX10","lnX2:X8:X9:lnX10"))
+
+
+ggplot(data = pvalores, aes(x = Variaveis, y = P.Valores)) +
+  geom_point() +
+  labs(title = "Gráfico de Linhas da convergência do p-valor",
+       x = "Eixo X",
+       y = "Eixo Y") +
+  theme_minimal()
+
+
+```
+
+Em contrapartida, foi análisado o p-valor do modelo conforme é acrescentada cada uma das variáveis. A partir do momento em que cruzamos as informações dos dois gráficos, vemos que conforme acrescentamos as variáveis obtemos uma explicação maior assim como um maior controle dos resíduos no que diz a convergência a normalidade. A variáveis lnX2 possui uma grande importância na explicação do modelo, contudo seus resíduos são nada controlados. Conforme acrescentamos as variáveis é observado um maior p-valor no teste de normalidade dos resíduos. A partir do momento em que introduzimos as interações das variáveis pertinentes do modelo, vemos que os resíduos se mostram muito mais controlados, demonstrando assim que as interações, apesar de não explicarem muito em termos de R2 ponderado, possuem um poder gigantesco para controlar a normalidade dos resíduos.
+
+\newpage
 
 # Conclusões
-
-
 
