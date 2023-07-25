@@ -94,7 +94,7 @@ ggplot(dados) +
         axis.line = element_line(colour = "black"),
     plot.title = element_text(size = 12, face = "plain", hjust = 0.5),
     plot.title.position = "plot") +
-   ggtitle("Figura 1: Gráfico boxplot do preço de venda da casa (em dólares)")
+   ggtitle("Gráfico boxplot do preço de venda da casa (em dólares)")
 ```
 
 
@@ -108,7 +108,7 @@ tabela_resumo <- data.frame(
   Valor = c(84000,  180000, 229900, 227894, 335000,92000,round(desvio_padrao))
 )
 
-kable(tabela_resumo, caption = "Quadro 1: Medidas Resumo do preço de venda da casa (em dólares)") %>%
+kable(tabela_resumo, caption = "Medidas Resumo do preço de venda da casa (em dólares)") %>%
   kable_styling(latex_options = c("hold_position")) %>%
   column_spec(1, bold = TRUE)
 ```
@@ -147,7 +147,7 @@ ggplot(dados) +
         axis.line = element_line(colour = "black"),
     plot.title = element_text(size = 12, face = "plain", hjust = 0.5),
     plot.title.position = "plot") +
-   ggtitle("Figura 1: Gráfico boxplot do tamanho da casas(pés quadrados)")
+   ggtitle("Gráfico boxplot do tamanho da casas(pés quadrados)")
 
 ```
 
@@ -164,7 +164,7 @@ tabela_resumo <- data.frame(
   Valor = c(980,  1701, 2061, 2261, 2636, 5032, desvio_padrao)
 )
 
-kable(tabela_resumo, caption = "Quadro 1: Medidas Resumo tamanho das casas (pés quadrados)") %>%
+kable(tabela_resumo, caption = "Medidas Resumo tamanho das casas (pés quadrados)") %>%
   kable_styling(latex_options = c("hold_position")) %>%
   kableExtra::column_spec(1, bold = TRUE)
 
@@ -205,7 +205,7 @@ dados1 = dados %>% group_by(X3) %>% tally() %>%
         axis.line = element_line(colour = "black"),
     plot.title = element_text(size = 12, face = "plain", hjust = 0.5),
     plot.title.position = "plot") +
-  ggtitle("Figura 2: Gráfico de colunas do número de quartos")
+  ggtitle("Gráfico de colunas do número de quartos")
 
 ```
 
@@ -238,7 +238,7 @@ dados1 = dados %>% group_by(X4) %>% tally() %>%
         axis.line = element_line(colour = "black"),
     plot.title = element_text(size = 12, face = "plain", hjust = 0.5),
     plot.title.position = "plot") +
-  ggtitle("Figura 3: Gráfico de colunas do número de banheiros")
+  ggtitle("Gráfico de colunas do número de banheiros")
 
 ```
 
@@ -276,7 +276,7 @@ ggplot(freq_df, aes(x = "", y = absolute_freq, fill = Categoria)) +
   theme_void() +
   theme(plot.title = element_text(size = 12, face = "plain", hjust = 0.5),
     plot.title.position = "plot")+
-  ggtitle("Figura 4: Gráfico de setor sobre a presença(ou não) de ar condicionado nas casas")
+  ggtitle("Gráfico de setor sobre a presença(ou não) de ar condicionado nas casas")
 ```
 
 Diante da figura 4, constata-se que 83\% das casas construídas nos anos de 1885 a 1998 não tinham ar condicionado.
@@ -309,7 +309,7 @@ dados1 = dados %>% group_by(X6) %>% tally() %>%
         axis.line = element_line(colour = "black"),
     plot.title = element_text(size = 12, face = "plain", hjust = 0.5),
     plot.title.position = "plot") +
-  ggtitle("Figura 5: Gráfico de colunas do tamanho da garagem das casas")
+  ggtitle("Gráfico de colunas do tamanho da garagem das casas")
 ```
 
 De acordo com a Figura 5, conclui-se que  a maioria das casas construídas (cerca de 67,62%) tem espaço para aproximadamente 2 carros em suas garagens. Além disso, cerca de 20% das casas têm capacidade para acomodar 3 carros.Por outro lado, casas com espaço para apenas 1 carro representam menos de 10% do total. Destaca-se também as casas com espaço para 4, 5 ou 7 carros que são ainda mais raras, compreendendo menos de 1% do total cada.
@@ -348,7 +348,7 @@ ggplot(freq_df, aes(x = "", y = absolute_freq, fill = Categoria)) +
   theme_void() +
    theme(plot.title = element_text(size = 12, face = "plain", hjust = 0.5),
     plot.title.position = "plot")+
-  ggtitle("Figura 6: Gráfico de setor sobre a presença(ou não) de ar piscina nas casas")
+  ggtitle("Gráfico de setor sobre a presença(ou não) de ar piscina nas casas")
 
 ```
 
@@ -384,7 +384,7 @@ ggplot(dados) +
         axis.line = element_line(colour = "black"),
     plot.title = element_text(size = 12, face = "plain", hjust = 0.5),
     plot.title.position = "plot") +
-   ggtitle("Figura 7: Gráfico boxplot da idade das casas(anos)")
+   ggtitle("Gráfico boxplot da idade das casas(anos)")
 #summary(dados$X8)
 #sd(summary(dados$X8))
 ```
@@ -400,7 +400,7 @@ tabela_resumo <- data.frame(
   Valor = c(0,17, 32, 31.1, 42, 113, desvio_padrao)
 )
 
-kable(tabela_resumo, caption = "Quadro 2: Medidas Resumo  da idade das casas(anos)") %>%
+kable(tabela_resumo, caption = "Medidas Resumo  da idade das casas(anos)") %>%
   kable_styling(latex_options = c("hold_position")) %>%
   kableExtra::column_spec(1, bold = TRUE)
 ```
@@ -450,7 +450,7 @@ ggplot(freq_df, aes(x = fct_reorder(Categoria,absolute_freq, .desc=T), y = absol
          axis.line = element_line(colour = "black"),
          plot.title = element_text(size = 12, face = "plain", hjust = 0.5),
     plot.title.position = "plot")+
-   ggtitle("Figura 8: Gráfico de colunas da qualidade da construção das casas")
+   ggtitle("Gráfico de colunas da qualidade da construção das casas")
 ```
 
 Baseando-se na Figura 8, comprova-se que mais da metade das casas (55,6\%) foram construídas com uma qualidade média. Enquanto isso, 31\% das casas têm uma baixa qualidade e somente 13\% delas são consideradas de alta qualidade.
@@ -481,7 +481,7 @@ ggplot(dados) +
     axis.line = element_line(colour = "black"),
         plot.title = element_text(size = 12, face = "plain", hjust = 0.5),
     plot.title.position = "plot") +
-     ggtitle("Figura 9: Gráfico boxplot do tamanho do terreno(em pés quadrados)")
+     ggtitle("Gráfico boxplot do tamanho do terreno(em pés quadrados)")
 
 #summary(dados$X10)
 #sd(summary(dados$X10))
@@ -498,7 +498,7 @@ tabela_resumo <- data.frame(
   Valor = c(4560,17205,22200,24370, 26787,  86830 , desvio_padrao)
 )
 
-kable(tabela_resumo, caption = "Quadro 3: Medidas Resumo do tamanho do terreno(em pés quadrados)") %>%
+kable(tabela_resumo, caption = "Medidas Resumo do tamanho do terreno(em pés quadrados)") %>%
   kable_styling(latex_options = c("hold_position")) %>%
   kableExtra::column_spec(1, bold = TRUE)
 ```
@@ -540,7 +540,7 @@ ggplot(freq_df, aes(x = "", y = absolute_freq, fill = Categoria)) +
   theme_void() +
    theme(plot.title = element_text(size = 12, face = "plain", hjust = 0.5),
     plot.title.position = "plot")+
-  ggtitle("Figura 10: Gráfico de setor sobre proximidade das casas com a rodovia")
+  ggtitle("Gráfico de setor sobre proximidade das casas com a rodovia")
 ```
 
 Analisando a Figura 10, comprova-se que 97,9\% das casas que foram construídas entre 1885 e 1998 não são próximas da rodovia. Apenas 11(2,1\%) casas ficam perto das rodovias.
@@ -564,21 +564,6 @@ De acordo com o correlograma,conclui-se que há uma correlação:
 - Moderada(Positiva) entre $X_{2}$ e $X_{3}$, $X_{2}$ e $X_{4}$, $X_{2}$ e $X_{6}$, $X_{3}$ e $X_{4}$,$X_{4}$ e $X_{6}$
 - Moderada(Negativa) entre $X_{4}$ e $X_{8}$
 - Forte entre $X_{2}$ e $X_{4}$
-
-\newpage
-
-# Correlograma das variáveis escolhidas no modelo
-
-
-Para as variáveis escolhidadas no modelo, tem-se o correlograma a seguir:
-
-```{r quinze,cache=TRUE}
-# Correlograma das variáveis escolhidas no modelo
-
-mod <- cor(dados[, c("X2","X8","X10")])
-corrplot(mod, method = 'number')
-
-```
 
 \newpage
 
@@ -1181,6 +1166,18 @@ kable(cor(t2))
 
 ```
 
+## Correlograma das variáveis escolhidas no modelo
+
+Para as variáveis escolhidadas no modelo, tem-se o correlograma a seguir:
+
+```{r quinze,cache=TRUE}
+# Correlograma das variáveis escolhidas no modelo
+
+mod <- cor(dados[, c("X2","X8","X10")])
+corrplot(mod, method = 'number')
+
+```
+
 Foram geradas as matrizes de correlação entre as variáveis numericas do modelo transformado e o das variáveis  originais onde não foi notada grandes evidências de multicolinearidade entre as variáveis. A única diferença seria quanto a correlação entre X8 e lnX10, onde no modelo de variáveis originais ela é um pouco maior, saindo de -0.07 para -0.12, ou seja, ainda que exista diferença não é algo significante. A mesma situação acontece com lnX2 e X8.
 
 # Testando o ajuste do modelo no conjunto de teste
@@ -1201,6 +1198,7 @@ Em ln, o modelo transformado está com um MSE baixíssimo (`r ln_m0_MSE`) dos va
 
 Concluímos portanto que o modelo treinado com o conjunto de treino de 300 observações prediz bem quando aplicado no conjunto de testes de 222 observações.
 
+\newpage
 
 # Validação do modelo pelos coeficiente de Mallow.
 
