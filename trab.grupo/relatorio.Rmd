@@ -72,6 +72,333 @@ dados$X11 <- factor(dados$X11)
 
 \newpage
 
+# Introdução
+
+O projeto em questão visa realizar análises estatísticas abrangentes sobre o mercado imobiliário em uma localizada não especificada, com foco nos preços de venda de casas. O objetivo principal é desenvolver um modelo preditivo capaz de estimar o preço de venda de residências com base em várias características relevantes da casa e do seu entorno.
+
+As características que serão poderão utilizadas para realizar essas predições incluem o tamanho da casa em pés quadrados, o número de quartos e banheiros, a presença de ar condicionado, o tamanho da garagem, a existência ou ausência de piscina, o ano de construção, a qualidade da construção, o tamanho do terreno e a proximidade com a rodovia. Esses atributos foram selecionados com base na suposição de que eles podem exercer influência significativa sobre os preços de venda das casas.
+
+O conjunto de dados utilizado no projeto compreende informações detalhadas sobre essas onze características de 522 casas.
+
+Por meio da combinação de técnicas estatísticas avançadas e visualizações gráficas, espera-se obter insights valiosos sobre os principais fatores que impactam o preço de venda de casas na cidade em questão. Esses resultados podem ser úteis para compradores, vendedores e profissionais do mercado imobiliário, fornecendo informações sólidas para auxiliar em decisões de investimento e estratégias de negociação.
+
+Além disso, a modelagem regressiva é interessante para determinar com quais características mínimas é possível obter com boa margem de confiança a resposta a que se quer chegar, no caso, o preço das casas; sem ter que coletar tantas variáveis, o que encarece o processo de levantamento de dados.
+
+Para realizar as análises e visualizações dos dados, o software R na versão 4.1.3 foi escolhido como a ferramenta principal, além de ferramentas auxiliares como o SAS, o Overleaf e o rmarkdown, utilizado junto ao R no RStudio.
+
+\newpage
+
+# Metodologia
+
+## Boxplot
+
+O boxplot é uma representação gráfica na qual se pode perceber de forma mais clara como os dados estão distribuídos. 
+
+A porção inferior do retângulo diz respeito ao primeiro quartil, enquanto a superior indica o terceiro quartil. Já o traço no interior do retângulo representa a mediana do conjunto de dados, ou seja, o valor em que o conjunto de dados é dividido em dois subconjuntos de mesmo tamanho. A média é representada pelo losango branco e os pontos são \textit{outliers}. Os \textit{outliers} são valores discrepantes da série de dados, ou seja, valores que não demonstram a realidade de um conjunto de dados.
+
+## Teste de Normalidade de Shapiro-Wilk
+O Teste de Shapiro-Wilk é utilizado para verificar a aderência de uma variável quantitativa ao modelo da Distribuição Normal, sendo mais recomendado para amostras pequenas. A suposição de normalidade é importante para a determinação do teste a ser utilizado. As hipóteses a serem testadas são: 
+
+$$\begin{cases}
+H_{0}: \mbox{A variável segue uma distribuição Normal}  \\ 
+H_{1}: \mbox{A variável segue outro modelo} \\
+\end{cases}$$
+
+# Modelo de regressão linear
+
+Modelos de regressão linear são utilizados para fazer predições de uma variável explicativa quantitativa Y com base em valores de variáveis quantitativas ou qualitativas X. O modelo se diz linear pois os parâmetros interagem entre sí de maneira linear. Um modelo de regressão linear múltiplo generalizado é dado pela expressão abaixo:
+
+$$Y_i=\beta_0 + \beta_1 X_{1i} + \beta_2 X_{2i} + \ldots + \beta_k X_{ki} +\epsilon_i$$
+
+Onde: $Y_i$ é o valor da variável resposta para uma dada observação; $\beta_0$ é o valor esperado de Y caso os valores de todas as variáveis explicativas sejam 0, também chamado de intercepto; $\beta_k$ é o aumento na variável resposta causado pelo aumento de uma unidade da variável $X_k$; $X_{ki}$ é o valor observado da k-ésima variável explicativa na i-ésima observação, essas variáveis podendo ser transformações de outras variáveis, contanto que $X_k$ sejam independentes; $\epsilon_i$ é o componente do erro aleatório.
+
+Para o modelo de regressão linear, se assume que $\epsilon_i$ são independentes e identicamente distribuidos, seguindo distribuição normal com média 0 e variância constante $\sigma^2$.
+
+A partir do modelo acima, um modelo pode ser ajustado para fazer predições da variável explicativa, dado pela expressão abaixo:
+
+$$\hat{Y}_i=\hat{\beta}_0 + \hat{\beta}_1 X_{1i} + \hat{\beta}_2 X_{2i} + \ldots + \hat{\beta}_k X_{ki}$$
+
+Onde: $\hat{Y}_i$ é o valor predito da variável resposta para uma dada observação; $\hat{\beta}_0$ é o valor predito de Y caso os valores de todas as variáveis explicativas sejam 0, também chamado de intercepto; $\hat{\beta}_k$ é a estimativa do aumento na variável resposta causado pelo aumento de uma unidade da variável $X_k$; $X_{ki}$ é o valor observado da k-ésima variável explicativa na i-ésima observação, essas variáveis podendo ser transformações de outras variáveis, contanto que $X_k$ sejam independentes.
+
+
+O modelo também pode ser escrito de forma matricial, dado pela expressão abaixo:
+
+$$\textbf{Y}=\textbf{X}\boldsymbol\beta + \boldsymbol\epsilon$$
+
+Onde: $\textbf{Y}$ é o vetor das observações da variável resposta; $\textbf{X}$ é a matriz das observações das variáveis explicativas; $\boldsymbol\beta$ é o vetor dos parâmetros; $\boldsymbol\epsilon$ é o vetor dos erros das observações.
+
+O modelo para predições em forma matricial é dado por:
+$$\hat{\textbf{Y}}=\textbf{X}\hat{\boldsymbol\beta}$$
+
+Onde: $\hat{\textbf{Y}}$ é o vetor das predições da variável resposta; $\textbf{X}$ é a matriz das observações das variáveis explicativas; $\hat{\boldsymbol\beta}$ é o vetor dos estimadores dos parâmetros.
+
+
+# Estimativa dos Parâmetros
+
+Os parâmetros dos modelos de regressão podem ser facilmente estimados em forma matricial. O vetor de estimadores de mínimos quadrados é dado pela seguinte formula:
+
+$$ \hat{\boldsymbol\beta}= \left( \textbf{X}'\textbf{X} \right) ^{-1} \textbf{X}' \textbf{Y}$$
+
+Sendo:
+\begin{itemize}
+\item $\textbf{Y} = $ vetor de observações da variável resposta 
+\item $\textbf{X}=$ matriz de observações do conjunto de variáveis explicativas
+\end{itemize}
+
+
+# Definição de termos relacionados a modelos de regressão linear
+
+## Soma de Quadrados dos Resíduos (SSE)
+
+Mede a variação total dos resíduos depois de ajustar um modelo de regressão para os dados. O cálculo de um resíduo é dado pela formula abaixo:
+
+$$ e_{i} = y_{i} - \hat{y}_{i} $$
+
+Onde:
+\begin{itemize}
+\item $n = $ tamanho da amostra
+\item $y_i=$ i-ésimo valor da variável $Y$
+\item $\hat{y}_i=$ predição da variável $Y$ para a i-ésima observação
+\end{itemize}
+
+O SSE é dado então pela formula:
+
+$$ SSE = \sum_{i=1}^{n} e_i^{2} $$
+
+Sendo:
+\begin{itemize}
+\item $n = $ tamanho da amostra
+\item $e_i=$ resídou para a i-ésimo observação
+\end{itemize}
+
+## Soma de Quadrados da Regressão (SSReg)
+
+Mede a variação total explicada pelo conjunto de variáveis \textbf{X}. O seu calculo é dado pela seguinte formula:
+
+$$ SSReg = \sum_{i=1}^{n} \left(\hat{y_i} - \bar{y}\right)^{2}  $$
+
+Onde:
+\begin{itemize}
+\item $n = $ tamanho da amostra
+\item $\bar{y}=$ média dos valores da variável $Y$
+\item $\hat{y}_i=$ predição da variável $Y$ para a i-ésima observação
+\end{itemize}
+
+## Soma de Quadrados Total (SSTO)
+
+Mede a variação total da variável explicativa Y. É calculada segundo a seguinte formula:
+
+$$ SSTO = \sum_{i=1}^{n} \left(y_i-\bar{y}\right)^{2}  $$
+
+Sendo: 
+\begin{itemize}
+\item $n = $ tamanho da amostra
+\item $y_i=$ i-ésimo valor da variável $Y$
+\item $\bar{y}=$ média dos valores da variável $Y$
+\end{itemize}
+
+Também é possível encontrar SSTO a partir de SSReg e SSE, seguindo a seguinte equação:
+
+$$SSTO = SSReg + SSE$$
+
+## Quadrado Médio dos Resíduos (MSE)
+
+É uma estimativa não viesada da variância $\sigma^2$ dos erros $\epsilon_i$ nos modelos de regressão linear. É um componente utilizado no cálculo de várias estatísticas para testes relacionados à regressão. Seu calculo é dado pela seguinte formula:
+
+$$ MSE = \frac{SSE}{n-p} $$
+
+Onde: 
+\begin{itemize}
+\item $n = $ tamanho da amostra
+\item $p=$ número de parâmetros no modelo
+\item $SSE=$ soma de quadrados dos resíduos
+\end{itemize}
+
+## Quadrado Médio da Regressão (MSReg)
+
+É um componente utilizado no cálculo de várias estatísticas para testes relacionados à regressão. Seu calculo é dado pela seguinte formula:
+
+$$ MSReg = \frac{SSReg}{p-1} $$
+
+Onde: 
+\begin{itemize}
+\item $p=$ número de parâmetros no modelo
+\item $SSReg=$ soma de quadrados da regressão
+\end{itemize}
+
+
+## Resíduo Studentizado Externamente
+
+Mede o afastamento de uma dado resíduo em relação aos demais resíduos. Serve para avaliar se uma observação é discrepante em termos da variável resposta. Seu cálculo é dado pela seguinte expressão:
+
+$$t_i = e_i\left[ \frac{n-p-1}{\sqrt{SSE\left( 1-h_{ii} \right)-e_i^2}} \right]^{1/2} $$
+
+Sendo:
+\begin{itemize}
+\item $e_i=$ resídou para a i-ésimo observação
+\item $n = $ tamanho da amostra
+\item $p=$ número de parâmetros no modelo
+\item $SSE = $ soma de quadrados dos resíduos
+\item $h_{ii} =$ alavanca para a i-ésimo observação
+\end{itemize}
+
+## DFFITS
+
+Mede a influência que uma observação tem na predição de seu própio valor. Serve para avaliar se uma observação é influente no calculo de seu valor predito. Seu calculo é dado pela formula:
+
+$$DFFITS_i = t_i\left( \frac{h_{ii}}{1-h_{ii}} \right)^{1/2}$$
+
+Sendo:
+\begin{itemize}
+\item $t_i=$ resíduo studentizado externamente para a i-ésimo observação
+\item $h_{ii} =$ alavanca para a i-ésimo observação
+\end{itemize}
+
+## Distância de Cook (Cook's D)
+
+Mede a influência que uma observação tem na predição de todos valores da variável resposta. Serve para avaliar se uma observação é influente no calculo de todos valores preditos. Seu calculo é dado pela formula:
+
+$$D_i = \frac{e_i^2}{p MSE}\left( \frac{h_{ii}}{\left( 1-h_{ii} \right)^2} \right)$$
+
+Sendo:
+\begin{itemize}
+\item $e_i=$ resídou para a i-ésimo observação
+\item $p=$ número de parâmetros no modelo
+\item $MSE=$ quadrado médio dos resíduos
+\item $h_{ii} =$ alavanca para a i-ésimo observação
+\end{itemize}
+
+## DFBETAS
+
+Mede a influência que uma observação tem na estimação dos parâmetros do modelo. Serve para avaliar se uma observação é influente no calculo dos estimadores do modelo. Seu calculo para um dado parâmetro k é dado pela formula:
+$$\left(DFBETAS_{k}\right)_{i} = \frac{\hat{\beta}_k-\hat{\beta}_{k(i)}}{\sqrt{MSE_{(i)}c_{kk}}}$$
+
+Sendo:
+\begin{itemize}
+\item $\hat{\beta}_k=$ estimativa do k-ésimo parâmetro
+\item $\hat{\beta}_{k(i)}=$ estimativa do k-ésimo parâmetro sem a i-ésima observação
+\item $MSE_{(i)}=$ quadrado médio dos resíduos sem a i-ésima observação
+\item $c_{kk} =$ k-ésimo valor na diagonal da matriz $\left(\textbf{X}'\textbf{X}\right)^{-1}$, onde:
+\begin{itemize}
+\item $\textbf{X}=$ matriz de observações do conjunto de variáveis explicativas
+\end{itemize} 
+\end{itemize}
+
+# Métodos de Seleção de Modelos
+
+## Coeficiente de Determinação ($R^2$)
+
+Caclula quanto que a informação de uma variável ou um conjunto de variáveis explicativas \textbf{X} reduz a variância de uma variável resposta Y. É utilizado para medir quão bem as variáveis explicativas \textbf{X} explicam a variável resposta Y. Procura-se um modelo com um alto coeficiente de determinação. Em estudos de regressão, seu caclulo é dado pela seguinte expressão:
+ 
+$$ R^2 = 1 - \frac{SSE}{SSTO} $$
+
+Sendo: 
+\begin{itemize}
+\item $SSE = $ soma de quadrados dos resíduos
+\item $SSTO=$ soma de quadrados total
+\end{itemize} 
+
+## Coeficiente de Determinação Ajustado ($R_{a}^2$)
+
+Estimativa para o grau de explicação do modelo. Similar ao coeficiente de determinação, mas penalizado pela inclusão de novas variáveis no modelo. Procura-se um modelo com um alto coeficiente de determinação ajustado. Seu caclulo é dado pela seguinte expressão:
+ 
+$$ R_{a}^2 = 1 - \frac{n-1}{n-p} \frac{SSE}{SSTO} $$
+
+Sendo: 
+\begin{itemize}
+\item $n = $ tamanho da amostra
+\item $p=$ número de parâmetros no modelo
+\item $SSE = $ soma de quadrados dos resíduos
+\item $SSTO=$ soma de quadrados total
+\end{itemize} 
+
+## $C_p$ de Mallows
+
+Mede grau de ajuste de um modelo, levando em consideração o número de parâmetros no modelo. Procura-se um modelo com um $C_p \approx p$, sendo p o número de parâmetros no modelo. O seu cálculo é dado pela expressão:
+
+$$ C_p = \frac{SSE_p}{MSE} - (n-2p) $$
+
+Sendo: 
+\begin{itemize}
+\item $n = $ tamanho da amostra
+\item $p=$ número de parâmetros no modelo testado
+\item $SSE_p = $ soma de quadrados dos resíduos do modelo com p variáveis
+\item $MSE=$ quadrado médio dos resíduos do modelo com todas variáveis
+\end{itemize} 
+
+## Métodos de seleção automática
+
+São algoritmos iterativos que buscam o melhor modelo com base em uma serie de testes F de ausência de regressão e testes T de ausência de um parâmetro. Os métodos visam um modelo em que todas as variáveis inclusas foram significantes, ou todas as retiradas foram não significantes em ao menos uma iteração. Para todos os métodos, não há garantia que o melhor modelo será encontrado.
+
+### Método Backward
+
+Inicia-se com todas as variáveis no modelo. Depois, faz-se um teste F de ausência de regressão e se significativo, fazem-se testes T de ausência de um parâmetro para todas as variáveis incluídas, e se algum teste for não significativo, retira-se a variável associada ao teste com o maior p-valor, e se repetem os testes com o modelo novo. Se repete o procedimento até que todos p-valores sejam significativos.
+
+### Método Forward
+Inicia-se com nenhuma variáveis no modelo. Depois, faz-se um teste F de ausência de regressão e se significativo, fazem-se testes T de ausência de um parâmetro para todas as variáveis não incluídas, e se algum teste for significativo, inclui-se a variável associada ao teste com o menor p-valor, e se repetem os testes com o modelo novo. Se repete o procedimento até que todos p-valores sejam não significativos.
+
+### Método Stepwise
+
+Inicia-se com nenhuma variáveis no modelo. Depois, faz-se um teste F de ausência de regressão e se significativo, fazem-se testes T de ausência de um parâmetro para todas as variáveis não incluídas, e se algum teste for significativo, inclui-se a variável associada ao teste com o menor p-valor. Em seguida, faz-se um teste F de ausência de regressão e se significativo, fazem-se testes T de ausência de um parâmetro para todas as variáveis incluídas, e se algum teste for não significativo, retira-se a variável associada ao teste com o maior p-valor. Repetem-se os testes com o modelo novo até que nenhuma variável nova entre e nenhuma antiga saia. Esse método funciona como uma junção do método \textit{Forward} e o método \textit{Backward}.
+
+
+# Padronização de Variáveis
+
+Para o modelo de regrassão seguir todos os seus pressupostos, as vezes é necessário reparametrizar ou padronizar algumas variáveis, para evitar problemas de não linearidade entre as variáveis explicativas e a variável resposta ou até mesmo de multicolinearidade entre as variáveis explicativas.
+
+## One Hot Encoding
+
+Esse procedimento é utilizado para transformação de variáveis qualitativas. Supondo que a variável qualitativa possui j categorias, são criadas j novas variáveis indicadoras para serem utilizadas no modelo, essas assumindo valores de 0 ou 1. Essas variáveis indicam se a observação pertence à uma categoria por receber um valor de 1 na variável indicativa associada à categoria, e um valor de 0 nas demais categorias. Podem ser criadas também j-1 novas variáveis, e designar uma categoria como a categoria padrão, representada quando todas as variáveis indicativas recebem um valor de 0.
+
+# Testes de hipóteses
+
+## Teste de Ausência de Regressão
+
+Testa se as variáveis explicativas $X_k$ tem influência na variável resposta Y.
+
+Hipóteses:
+
+$$\begin{cases}
+H_{0}: \mbox{$\beta_k=0, k=1, 2, ..., p-1$} \\ 
+H_{1}: \mbox{$\exists \beta_k \neq 0, k = 1, 2, ..., p-1$} \\
+\end{cases}$$
+
+Estatística do Teste: 
+
+$$F=\frac{MSReg}{MSE} \sim F_{p-1,n-p}$$
+
+Sendo:
+\begin{itemize}
+\item $MSReg=$ quadrado médio da regressão
+\item $MSE=$ quadrado médio dos resíduos
+\end{itemize}
+
+
+## Teste T de Ausência de um Parâmetro
+
+Testa se uma variável explicativa $X_k$ tem influência na variável resposta Y.
+
+Hipóteses:
+
+$$\begin{cases}
+H_{0}: \mbox{$\beta_k=0$} \\ 
+H_{1}: \mbox{$\beta_k \ne 0$} \\
+\end{cases}$$
+
+Estatística do Teste: 
+
+$$T=\frac{\hat{\beta}_k}{S(\hat{\beta}_k)} \sim t_{n-p}$$
+
+Sendo:
+\begin{itemize}
+\item $\hat{\beta}_k=$ estimativa do k-ésimo parâmetro
+\item $S(\hat{\beta}_k)=$ raiz quadrada da variação da estimativa do k-ésimo parâmetro
+\end{itemize}
+
+\newpage
+
+# Análises exploratórias
+
 # Preço de venda da casa
 
 A fim de analisar o comportamento da variável $X_{1}$ (tamanho da casa) dispõe-se o gráfico e o quadro a seguir:
@@ -645,6 +972,9 @@ Conforme explicitado anteriormente, a informação original da variável era o a
 Além disso, foi considerada a possiblidade de uma transformação quadrática nesta variável, visto que havia a suspeita que tanto casas muito novas teriam um valor maior, quanto casas muito antigas talvez pudessem também ter um valor elevado, considerando o valor histórico/relíquia; levando assim a variável a assumir uma forma de parábola. Entretando, analisando exploratóriamente, este comportamento não foi observado, na realidade notou-se uma relação quase linear no sentido de: quanto mais nova a casa; mais cara ela seria. Portanto, esta transformação foi descartada.
 
 \newpage
+
+# Análise de regressão linear
+
 
 # Seleção de variáveis
 
